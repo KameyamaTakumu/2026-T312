@@ -63,6 +63,9 @@ public class PlanetSurfaceWalker : MonoBehaviour
     /// </summary>
     private Vector3 _moveDir;
 
+    // ŠO•”‚©‚çŒ»Ý‚ÌˆÚ“®‘¬“x‚ðŽQÆ‚Å‚«‚é‚æ‚¤‚É‚·‚é
+    public Vector3 CurrentVelocity => _rb.linearVelocity;
+
     // „Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ
 
     private void Awake()

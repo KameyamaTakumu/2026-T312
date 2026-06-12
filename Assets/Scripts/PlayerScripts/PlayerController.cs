@@ -98,6 +98,13 @@ public class PlayerController : MonoBehaviour
     // FixedUpdate で入力を取りこぼさないようにする
     bool jumpRequested;
 
+    // 現在乗っている移動床
+    PlanetSurfaceWalker _currentPlatform;
+
+    // 前フレームの床水平速度を記憶
+    // 床から降りた瞬間に余分な速度を取り除くために使用
+    Vector3 _prevPlatformVelocity = Vector3.zero;
+
     void Awake()
     {
         // 毎フレーム GetComponent しないようキャッシュ
@@ -108,9 +115,7 @@ public class PlayerController : MonoBehaviour
 
         // カメラ未設定時は MainCamera を使用
         if (cameraTransform == null && Camera.main != null)
-        {
             cameraTransform = Camera.main.transform;
-        }
     }
 
     void Update()
@@ -123,8 +128,24 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        // 前フレームの床を記憶
+        PlanetSurfaceWalker prevPlatform = _currentPlatform;
+
         // 接地判定
         isGrounded = CheckGrounded();
+
+        // 床から降りた瞬間：前フレームの床速度を速度から取り除く
+        if (prevPlatform != null && _currentPlatform == null)
+        {
+            Vector3 planetUp = transform.up;
+            Vector3 vel = rb.linearVelocity;
+            Vector3 vVel = Vector3.Project(vel, planetUp);
+            Vector3 hVel = vel - vVel;
+
+            // 前フレームの床速度分を引いて「自分の速度だけ」に戻す
+            hVel -= _prevPlatformVelocity;
+            rb.linearVelocity = hVel + vVel;
+        }
 
         // 移動処理
         HandleMove();
@@ -132,12 +153,22 @@ public class PlayerController : MonoBehaviour
         // ジャンプ処理
         HandleJump();
 
+        // 今フレームの床速度を次フレームのために記憶
+        if (_currentPlatform != null)
+        {
+            Vector3 pv = _currentPlatform.CurrentVelocity;
+            _prevPlatformVelocity =
+                pv - Vector3.Project(pv, transform.up);
+        }
+        else
+        {
+            _prevPlatformVelocity = Vector3.zero;
+        }
+
         // カメラ更新
         // スピン中はカメラを固定
         if (spin == null || !spin.IsSpinning)
-        {
             UpdateCamera();
-        }
     }
 
     /// <summary>
@@ -151,23 +182,43 @@ public class PlayerController : MonoBehaviour
         // 縦入力（W,S / ↑↓）
         float v = Input.GetAxisRaw("Vertical");
 
+        // ─────────────────────────────────
+        // 惑星上方向
+        // ─────────────────────────────────
+
+        // GravityBody により transform.up が
+        // 惑星法線方向を向いている
+        Vector3 planetUp = transform.up;
+
+        // ─────────────────────────────────
+        // 移動床の水平速度を取得
+        // 目標速度の基準として使用する（毎フレーム加算はしない）
+        // ─────────────────────────────────
+        Vector3 platformVelocity = Vector3.zero;
+        if (_currentPlatform != null)
+        {
+            Vector3 pv = _currentPlatform.CurrentVelocity;
+            // 重力方向成分は除外（プレイヤー自身の重力で処理するため）
+            platformVelocity = pv - Vector3.Project(pv, planetUp);
+        }
+
         // 入力なし → 水平速度を減速して return
         if (Mathf.Approximately(h, 0f)
             && Mathf.Approximately(v, 0f))
         {
-            Vector3 up = transform.up;
             Vector3 vel = rb.linearVelocity;
-            Vector3 vVel = Vector3.Project(vel, up);
+            Vector3 vVel = Vector3.Project(vel, planetUp);
             Vector3 hVel = vel - vVel;
 
             // 地上のみ減速（空中は慣性を維持）
+            // 床がある場合は「床速度へ向かって減速」する
+            // 床がない場合はゼロへ向かって減速
             if (isGrounded)
             {
                 hVel = Vector3.MoveTowards(
                     hVel,
-                    Vector3.zero,
-                    deceleration * Time.fixedDeltaTime
-                );
+                    platformVelocity,
+                    deceleration * Time.fixedDeltaTime);
             }
 
             rb.linearVelocity = hVel + vVel;
@@ -177,14 +228,6 @@ public class PlayerController : MonoBehaviour
         // 地上で入力あり → 走り中としてチュートリアルへ通知
         if (isGrounded)
             TutorialManager.Instance?.NotifyRunning(Time.fixedDeltaTime);
-
-        // ─────────────────────────────────
-        // 惑星上方向
-        // ─────────────────────────────────
-
-        // GravityBody により transform.up が
-        // 惑星法線方向を向いている
-        Vector3 planetUp = transform.up;
 
         // ─────────────────────────────────
         // カメラ基準移動方向
@@ -245,8 +288,9 @@ public class PlayerController : MonoBehaviour
         Vector3 currentHorizontal =
             rb.linearVelocity - verticalVelocity;
 
-        // 目標水平速度
-        Vector3 targetHorizontal = moveDir * moveSpeed;
+        // 目標水平速度 = 床速度 + プレイヤー入力速度
+        // 床の上ではプレイヤーの入力が床を基準とした相対移動になる
+        Vector3 targetHorizontal = platformVelocity + moveDir * moveSpeed;
 
         // 地上・空中で加速度を切り替え
         float accel = isGrounded ? acceleration : airAcceleration;
@@ -261,7 +305,7 @@ public class PlayerController : MonoBehaviour
 
         rb.linearVelocity = newHorizontal + verticalVelocity;
     }
-    
+
     /// <summary>
     /// ジャンプ処理
     /// </summary>
@@ -333,14 +377,14 @@ public class PlayerController : MonoBehaviour
 
         // 少し上から下方向へ SphereCast
         // 通常 Raycast より曲面地形に強い
-        return Physics.SphereCast(
+        bool grounded = Physics.SphereCast(
             origin,
             radius * 0.95f,
 
             // 惑星下方向
             -transform.up,
 
-            out _,
+            out RaycastHit hit,
 
             // 接地判定距離
             groundCheckDistance,
@@ -348,6 +392,13 @@ public class PlayerController : MonoBehaviour
             // 地面レイヤー
             groundLayer
         );
+
+        // 乗っている床を更新
+        _currentPlatform = grounded
+            ? hit.collider.GetComponent<PlanetSurfaceWalker>()
+            : null;
+
+        return grounded;
     }
 
     /// <summary>
