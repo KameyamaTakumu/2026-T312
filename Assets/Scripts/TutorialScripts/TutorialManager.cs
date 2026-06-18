@@ -135,6 +135,9 @@ public class TutorialManager : MonoBehaviour
             _playerSpin = player.GetComponent<PlayerSpin>();
         }
 
+        // メッセージを初期化しておく
+        ShowMessage("");
+
         // 開始前は UI を非表示にしておく
         if (uiRoot != null) uiRoot.SetActive(false);
         if (gaugeRoot != null) gaugeRoot.SetActive(false);
@@ -181,7 +184,6 @@ public class TutorialManager : MonoBehaviour
         _runAccumulatedTime = 0f;
 
         TutorialStep step = steps[index];
-        Debug.Log($"[Tutorial] ステップ {index + 1}/{steps.Count}：{step.stepName}");
 
         // 進行度テキストを現在のインデックスに合わせて更新
         UpdateStepCountText();
@@ -308,8 +310,6 @@ public class TutorialManager : MonoBehaviour
     {
         TutorialStep step = CurrentStep;
 
-        Debug.Log($"[Tutorial] ステップ完了：{step.stepName}");
-
         // ステップ完了イベントを発火（外部での追加処理に対応するため）
         step.onStepComplete?.Invoke();
 
@@ -327,7 +327,7 @@ public class TutorialManager : MonoBehaviour
         if (step.despawnOnComplete)
             DespawnStepObjects();
 
-        ShowMessage($"{step.stepName}");
+        //ShowMessage($"{step.stepName}");
         yield return new WaitForSeconds(stepCompleteDelay);
 
         AdvanceToStep(_currentStepIndex + 1);
@@ -335,14 +335,13 @@ public class TutorialManager : MonoBehaviour
 
     /// <summary>
     /// 全ステップ完了後の処理
-    ///
     /// 完了メッセージを一定時間表示してから UI を非表示にする
     /// </summary>
     private IEnumerator CompleteTutorial()
     {
         _isRunning = false;
         ShowMessage(completeMessage);
-        Debug.Log("[Tutorial] チュートリアル完了！");
+        Debug.Log("チュートリアル完了！");
 
         yield return new WaitForSeconds(hideUIDelay);
         if (uiRoot != null) uiRoot.SetActive(false);
@@ -354,27 +353,27 @@ public class TutorialManager : MonoBehaviour
 
     /// <summary>
     /// ステップに登録されたプレハブをシーンへ出現させる
-    ///
     /// SpawnPoint が設定されていない場合は TutorialManager の位置に出現する
     /// </summary>
     private void SpawnStepObjects(TutorialStep step)
     {
-        for (int i = 0; i < step.spawnPrefabs.Length; i++)
+        foreach (var data in step.spawnObjects)
         {
-            GameObject prefab = step.spawnPrefabs[i];
-            if (prefab == null) continue;
+            if (data == null || data.prefab == null)
+                continue;
 
-            // SpawnPoint が対応するインデックスになければ自分の位置を使う
-            Vector3 pos = (i < step.spawnPoints.Length && step.spawnPoints[i] != null)
-                ? step.spawnPoints[i].position
-                : transform.position;
-            Quaternion rot = (i < step.spawnPoints.Length && step.spawnPoints[i] != null)
-                ? step.spawnPoints[i].rotation
-                : Quaternion.identity;
+            GameObject obj = Instantiate(
+                data.prefab,
+                data.position,
+                Quaternion.Euler(data.rotation)
+            );
 
-            GameObject obj = Instantiate(prefab, pos, rot);
             _spawnedObjects.Add(obj);
-            Debug.Log($"[Tutorial] オブジェクト出現：{prefab.name}");
+
+            Debug.Log(
+                $"オブジェクト出現：{data.prefab.name} " +
+                $"Pos={data.position} Rot={data.rotation}"
+            );
         }
     }
 
@@ -394,7 +393,6 @@ public class TutorialManager : MonoBehaviour
 
     /// <summary>
     /// ステップの GoalZone をシーンから検索して有効化する
-    ///
     /// ReachGoalZone 以外の条件、またはゾーン名が未設定の場合は何もしない
     /// </summary>
     private void ActivateGoalZone(TutorialStep step)
@@ -408,13 +406,13 @@ public class TutorialManager : MonoBehaviour
         GameObject zoneObj = GameObject.Find(step.goalZoneObjectName);
         if (zoneObj == null)
         {
-            Debug.LogWarning($"[Tutorial] GoalZone '{step.goalZoneObjectName}' が見つかりません");
+            Debug.LogWarning($"GoalZone '{step.goalZoneObjectName}' が見つかりません");
             return;
         }
 
         _currentGoalZone = zoneObj.GetComponent<TutorialGoalZone>();
         zoneObj.SetActive(true);
-        Debug.Log($"[Tutorial] GoalZone 有効化：{step.goalZoneObjectName}");
+        Debug.Log($"GoalZone 有効化：{step.goalZoneObjectName}");
     }
 
     // ─────────────────────────────────────────
@@ -449,7 +447,6 @@ public class TutorialManager : MonoBehaviour
 
     /// <summary>
     /// AutoClear 条件用のタイマーコルーチン
-    ///
     /// autoClearDelay 秒後に自動でステップをクリアする
     /// </summary>
     private IEnumerator AutoClearCoroutine(TutorialStep step)

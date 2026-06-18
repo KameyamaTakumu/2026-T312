@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 369b9ebe3a62b904dbc19bd332b44086, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -289,7 +289,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3440331503220224229, guid: 981ef21047f417142b96fd15ca08f3ff, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.77
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3440331503220224229, guid: 981ef21047f417142b96fd15ca08f3ff, type: 3}
       propertyPath: m_LocalRotation.w
@@ -518,14 +518,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11df80eb6e2413449b08190918234a2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
-  steps: []
+  steps:
+  - {fileID: 11400000, guid: 0a90f54b3d2b21c40950202673f8a020, type: 2}
+  - {fileID: 11400000, guid: b96fabe4f032def42b1f754b673dced7, type: 2}
+  - {fileID: 11400000, guid: 0c952788be5ee2948b9899b9cc9c8c20, type: 2}
+  - {fileID: 11400000, guid: 22784e0493cdf604fa1337ed57d6fe29, type: 2}
+  - {fileID: 11400000, guid: a5abc8deab198f248bb01c67909bc86f, type: 2}
   messageText: {fileID: 757095105}
   uiRoot: {fileID: 1191632496}
   stepCountText: {fileID: 1641545524}
   gaugeRoot: {fileID: 1202100657}
   gaugeSlider: {fileID: 1202100659}
-  stepStartDelay: 0.5
-  stepCompleteDelay: 1
+  stepStartDelay: 0
+  stepCompleteDelay: 0
   completeMessage: "\u30C1\u30E5\u30FC\u30C8\u30EA\u30A2\u30EB\u5B8C\u4E86\uFF01"
   hideUIDelay: 3
 --- !u!4 &392564195
@@ -612,7 +617,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1

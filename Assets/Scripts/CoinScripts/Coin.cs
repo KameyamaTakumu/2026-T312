@@ -68,7 +68,7 @@ public class Coin : MonoBehaviour
     {
         // 見た目用の自転
         // Space.Self にすることで自身のローカル軸で回転する
-        transform.Rotate(Vector3.up, spinSpeed * Time.deltaTime, Space.Self);
+        transform.Rotate(Vector3.forward, spinSpeed * Time.deltaTime, Space.Self);
     }
 
     private void FixedUpdate()
