@@ -27,6 +27,9 @@ public class TutorialGoalZone : MonoBehaviour
     [CustomLabel("到達後に自動で非表示にする"), SerializeField]
     private bool hideOnReach = true;
 
+    // 自身が持つ Collider
+    private Collider col;
+
     // ─────────────────────────────────────────
 
     private void Awake()
@@ -35,6 +38,15 @@ public class TutorialGoalZone : MonoBehaviour
         // TutorialStep 側との連携を簡単にするため
         if (string.IsNullOrEmpty(zoneName))
             zoneName = gameObject.name;
+    }
+
+    private void Start()
+    {
+        // isTrigger や Gizmo 描画のため Collider を取得
+        col = GetComponent<Collider>();
+
+        // IsTriggerを有効にしておく
+        col.isTrigger = true;
     }
 
     /// <summary>
@@ -59,13 +71,10 @@ public class TutorialGoalZone : MonoBehaviour
 
     /// <summary>
     /// Sceneビューで選択中のみ表示される Gizmo
-    ///
     /// GoalZone の範囲が視覚的に分かるように描画する
     /// </summary>
     private void OnDrawGizmosSelected()
     {
-        Collider col = GetComponent<Collider>();
-
         // Collider が無ければ描画しない
         if (col == null) return;
 

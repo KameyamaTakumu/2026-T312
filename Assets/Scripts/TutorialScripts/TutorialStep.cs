@@ -22,18 +22,11 @@ public class TutorialStep : ScriptableObject
     // ─────────────────────────────────────────
 
     [Header("表示設定")]
-
-    // 管理用の名前
-    // プレイヤーには表示されない
-    // デバッグログやステップ管理に使用する
-    [CustomLabel("ステップ名（管理用）")]
-    public string stepName = "Step_01";
-
     // ステップ開始時に表示する説明文
     // 「ジャンプしてください」など
     [CustomLabel("表示するメッセージ")]
     [TextArea(2, 5)]
-    public string message = "ジャンプしてください！";
+    public string message = "表示するメッセージをここに書いてください。";
 
     // ─────────────────────────────────────────
     // クリア条件
@@ -87,14 +80,9 @@ public class TutorialStep : ScriptableObject
 
     [Header("オブジェクト出現設定")]
 
-    // ステップ開始時に生成するプレハブ一覧
-    [CustomLabel("ステップ開始時に出現させる Prefab 一覧")]
-    public GameObject[] spawnPrefabs = new GameObject[0];
-
-    // 各プレハブの出現位置
-    // 配列の番号を spawnPrefabs と対応させる
-    [CustomLabel("出現位置（各 Prefab に対応）")]
-    public Transform[] spawnPoints = new Transform[0];
+    // オブジェクト参照・出現座標・出現回転をまとめた構造体
+    [CustomLabel("ステップ開始時に出現させるオブジェクト")]
+    public SpawnObjectData[] spawnObjects = new SpawnObjectData[0];
 
     // ステップ完了時に生成オブジェクトを削除するか
     [CustomLabel("ステップ終了時に出現オブジェクトを消す")]
@@ -132,4 +120,18 @@ public class TutorialStep : ScriptableObject
     /// </summary>
     [System.NonSerialized]
     public UnityEvent onStepComplete = new UnityEvent();
+}
+
+// オブジェクト参照・出現座標・出現回転をまとめた構造体
+[System.Serializable]
+public class SpawnObjectData
+{
+    [CustomLabel("出現させる Prefab")]
+    public GameObject prefab;
+
+    [CustomLabel("出現座標")]
+    public Vector3 position;
+
+    [CustomLabel("出現回転")]
+    public Vector3 rotation;
 }
