@@ -262,6 +262,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 629600046}
+    - target: {fileID: 9095887431910664783, guid: 560a5b12375c0aa4bb5938a7001c817a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c3435b7cf3210044b3a24266d8aebf1, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -514,10 +518,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11df80eb6e2413449b08190918234a2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
-  steps:
-  - {fileID: 11400000, guid: 19d75365882553f43bd73a2ca575c0d9, type: 2}
-  - {fileID: 11400000, guid: d7524ea768efa1d48a4be19236760085, type: 2}
-  - {fileID: 11400000, guid: 058e558632e43b54799584e51a0653e5, type: 2}
+  steps: []
   messageText: {fileID: 757095105}
   uiRoot: {fileID: 1191632496}
   stepCountText: {fileID: 1641545524}
@@ -1395,69 +1396,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!1001 &1434961775
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4601271912962101856, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: zoneName
-      value: TestZone
-      objectReference: {fileID: 0}
-    - target: {fileID: 5765150065747170320, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_Name
-      value: TutorialGoalZone
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 38
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8364009107469020941, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 6455486645556549662, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-    - {fileID: 6622447090851658098, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: e99b8a1356e1c63468055e25a2a9bcfa, type: 3}
 --- !u!1 &1641545521
 GameObject:
   m_ObjectHideFlags: 0
@@ -1681,4 +1619,3 @@ SceneRoots:
   - {fileID: 244063430}
   - {fileID: 87303629}
   - {fileID: 11857038}
-  - {fileID: 1434961775}
