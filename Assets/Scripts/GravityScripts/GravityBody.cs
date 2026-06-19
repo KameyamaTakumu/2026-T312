@@ -5,24 +5,20 @@ using UnityEngine;
 /// 重力制御コンポーネント
 ///
 /// 主な役割：
-/// ・最寄り惑星の重力適用
-/// ・引力ジャンプ制御
-/// ・引力ゾーン管理
-/// ・惑星固定処理
+/// ・通常時の重力制御
+/// ・引力ジャンプの開始と飛行制御
+/// ・GravityJumpZone のリレー移動
+/// ・着地後の GroundedLock 管理
+/// ・現在適用する GravityAttractor の管理
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class GravityBody : MonoBehaviour
 {
     // ─────────────────────────────────────────
-    // 引力ジャンプ設定
+    // Inspector 設定
     // ─────────────────────────────────────────
 
     [Header("引力ジャンプ設定")]
-
-    /// <summary>
-    /// 引力ジャンプ開始時の初速度
-    /// ゾーン中心へ向かって発射される
-    /// </summary>
     [CustomLabel("引力ジャンプのジャンプ力"), SerializeField]
     private float gravityJumpForce = 12f;
 
@@ -30,81 +26,59 @@ public class GravityBody : MonoBehaviour
     // 内部参照
     // ─────────────────────────────────────────
 
-    /// <summary>
-    /// 現在重力を受けている惑星
-    /// </summary>
-    private GravityAttractor _currentAttractor;
-
-    /// <summary>
-    /// Rigidbody キャッシュ
-    /// </summary>
     private Rigidbody _rb;
-
-    /// <summary>
-    /// シーン内の全惑星
-    /// </summary>
     private GravityAttractor[] _attractors;
+
+    // 現在重力を受けている惑星（GroundedLock 解除後の引き継ぎにも使用）
+    private GravityAttractor _currentAttractor;
 
     // ─────────────────────────────────────────
     // 引力ジャンプ状態
     // ─────────────────────────────────────────
 
-    /// <summary>
-    /// 現在入っている引力ゾーン
-    /// </summary>
+    // 現在向かっている（または侵入している）ゾーン
     private GravityJumpZone _currentZone;
 
-    /// <summary>
-    /// 引力ジャンプ中か
-    /// </summary>
+    // 引力ジャンプ飛行中か
     private bool _isBeingAttracted = false;
 
-    /// <summary>
-    /// 惑星固定中か
-    /// 到着直後の重力誤判定防止用
-    /// </summary>
+    // GroundedLock 中か（終点着地直後の誤判定防止）
     private bool _isGroundedLocked = false;
 
-    /// <summary>
-    /// 強制的に使用する惑星
-    /// 到着後の惑星固定に使用
-    /// </summary>
+    // GroundedLock 中に使用する強制惑星
     private GravityAttractor _forcedAttractor = null;
 
     // ─────────────────────────────────────────
     // 公開プロパティ
     // ─────────────────────────────────────────
 
-    /// <summary>
-    /// 引力ジャンプ中か
-    /// </summary>
     public bool IsBeingAttracted => _isBeingAttracted;
 
+    /// <summary>
+    /// PlayerController が毎 FixedUpdate で設定する接地フラグ。
+    /// 接地中はゾーン侵入登録を無視して、歩行中に意図せず
+    /// ジャンプが発動するのを防ぐ。
+    /// </summary>
+    public bool IsGrounded { get; set; }
+
+    // ─────────────────────────────────────────
+    // Unity ライフサイクル
     // ─────────────────────────────────────────
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-
-        // Unity標準重力は使用しない
         _rb.useGravity = false;
-
-        // 回転は GravityAttractor 側で制御するため固定
-        _rb.constraints =
-            RigidbodyConstraints.FreezeRotation;
+        _rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
     private void Start()
     {
-        // シーン内の全惑星取得
-        _attractors =
-            FindObjectsByType<GravityAttractor>(
-                FindObjectsSortMode.None);
+        _attractors = FindObjectsByType<GravityAttractor>(FindObjectsSortMode.None);
     }
 
     private void FixedUpdate()
     {
-        // 引力ジャンプ中なら専用処理
         if (_isBeingAttracted)
             UpdateAttractedMovement();
         else
@@ -115,148 +89,173 @@ public class GravityBody : MonoBehaviour
     // 通常重力
     // ─────────────────────────────────────────
 
-    /// <summary>
-    /// 通常時の重力処理
-    /// </summary>
     private void UpdateNormalGravity()
     {
-        if (_attractors == null ||
-            _attractors.Length == 0)
-            return;
+        if (_attractors == null || _attractors.Length == 0) return;
 
-        // 惑星固定中は強制惑星を使用
-        GravityAttractor target =
-            (_isGroundedLocked &&
-             _forcedAttractor != null)
-            ? _forcedAttractor
-            : GetNearestAttractor();
+        GravityAttractor target;
+
+        if (_isGroundedLocked && _forcedAttractor != null)
+        {
+            // GroundedLock 中は終点ゾーンで指定された惑星を強制使用
+            target = _forcedAttractor;
+        }
+        else if (_currentAttractor != null && _isGroundedLocked == false
+                 && _forcedAttractor == null)
+        {
+            // GroundedLock 解除直後はcurrentAttractor に引き継いだ惑星を使う
+            // GetNearestAttractor() が 1フレーム遅れで意図しない惑星を返すのを防ぐ
+            // _currentAttractor は次の GetNearestAttractor() 呼び出しで上書きされる
+            target = _currentAttractor;
+
+            // 惑星間の重なり問題を避けるため、接地した惑星が引力圏にある間は
+            // 近くても他の惑星を選ばないよう距離チェックで確認してから切り替え
+            GravityAttractor nearest = GetNearestAttractor();
+            if (nearest != null && nearest != _currentAttractor)
+            {
+                // 現在惑星と最寄り惑星の距離差が一定以上なら切り替える
+                float distCurrent = Vector3.Distance(transform.position, _currentAttractor.transform.position);
+                float distNearest = Vector3.Distance(transform.position, nearest.transform.position);
+                if (distNearest < distCurrent * 0.7f)
+                    target = nearest;
+            }
+        }
+        else
+        {
+            target = GetNearestAttractor();
+        }
 
         if (target != null)
         {
             _currentAttractor = target;
-
-            // 重力適用
             target.Attract(_rb);
         }
     }
 
     // ─────────────────────────────────────────
-    // 引力ジャンプ中処理
+    // 引力ジャンプ飛行中処理
     // ─────────────────────────────────────────
 
-    /// <summary>
-    /// ゾーンへ引き寄せられている間の処理
-    /// </summary>
     private void UpdateAttractedMovement()
     {
         if (_currentZone == null)
         {
-            CancelAttraction();
+            // 飛行キャンセル
+            _isBeingAttracted = false;
             return;
         }
 
-        // 現在位置からゾーン中心へ向かうベクトル
-        // どちらの方向に飛べばよいかを表す
-        Vector3 toZone =
-            _currentZone.transform.position -
-            _rb.position;
-
-        // ゾーン中心までの直線距離
-        // 到着判定に使用する
+        Vector3 toZone = _currentZone.transform.position - _rb.position;
         float distance = toZone.magnitude;
 
-        // 到着判定
+        // ── 到着判定 ──
         if (distance <= _currentZone.ArrivalDistance)
         {
             OnArrivedAtZone();
             return;
         }
 
-        // ゾーン中心方向
-        Vector3 attractDir =
-            toZone.normalized;
+        // ── ゾーン中心へ加速 ──
+        Vector3 attractDir = toZone.normalized;
+        _rb.AddForce(attractDir * _currentZone.AttractForce);
 
-        // ゾーン中心方向へ加速
-        _rb.AddForce(
-            attractDir *
-            _currentZone.AttractForce);
+        // 速度上限
+        if (_rb.linearVelocity.magnitude > _currentZone.MaxAttractSpeed)
+            _rb.linearVelocity = _rb.linearVelocity.normalized * _currentZone.MaxAttractSpeed;
 
-        // 最大速度制限
-        Vector3 vel = _rb.linearVelocity;
-
-        // 速度が上限を超えた場合は強制的に制限する
-        // ゾーンが遠い場合に異常な速度になるのを防ぐ
-        if (vel.magnitude >
-            _currentZone.MaxAttractSpeed)
-        {
-            _rb.linearVelocity =
-                vel.normalized *
-                _currentZone.MaxAttractSpeed;
-        }
-
-        // 飛行方向へ向きを合わせる
+        // 進行方向へ向きを合わせる
         if (toZone.sqrMagnitude > 0.01f)
         {
-            // 進行方向を前方として回転情報を作成
-            // attractDir = 前方向
-            // transform.up = 上方向
-            // 惑星重力で維持されている上方向を保持したまま飛行方向へ頭部を向ける
-            Quaternion targetRot =
-                Quaternion.LookRotation(
-                    attractDir,
-                    transform.up);
-
-            // 現在の向きから目標方向へ徐々に回転
-            // Slerpを使うことで一瞬で向きが変わるのではなく滑らかに旋回する
-            _rb.MoveRotation(
-                Quaternion.Slerp(
-                    _rb.rotation,
-                    targetRot,
-                    5f * Time.fixedDeltaTime));
+            Quaternion targetRot = Quaternion.LookRotation(attractDir, transform.up);
+            _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, targetRot, 5f * Time.fixedDeltaTime));
         }
     }
 
     // ─────────────────────────────────────────
-    // 到着処理
+    // ゾーン到着処理
     // ─────────────────────────────────────────
 
     private void OnArrivedAtZone()
     {
-        _isBeingAttracted = false;
-        _rb.linearVelocity = Vector3.zero;
+        GravityJumpZone arrived = _currentZone;
+        GravityJumpZone next = arrived.NextZone;
 
-        // ゾーンに設定された惑星を強制引力先として記憶する
-        // null の場合は現時点の最寄り惑星にフォールバック
-        _forcedAttractor = _currentZone.TargetPlanet != null
-            ? _currentZone.TargetPlanet
-            : GetNearestAttractor();
+        Debug.Log($"引力ゾーンに到着：{arrived.gameObject.name}。次ゾーン：{(next != null ? next.gameObject.name : "なし（終点）")}");
 
-        StartCoroutine(GroundedLockCoroutine(_currentZone.GroundedLockDuration));
+        if (next != null)
+        {
+            // ── 中継ゾーン：飛行を止めずに次ゾーンへ切り替える ──
+            // 速度は引き継ぎ（急ブレーキなし）次ゾーンの引力で自然に加速する
+            _currentZone = next;
+            Debug.Log($"リレー継続 → {next.gameObject.name}");
+        }
+        else
+        {
+            // ── 終点ゾーン：惑星へ着地させる ──
+            _isBeingAttracted = false;
+            _currentZone = null;
 
-        Debug.Log($"引力ゾーンに到着。強制惑星：{_forcedAttractor?.gameObject.name}");
+            // 着地先惑星を決定
+            // 終点ゾーンで指定された惑星を優先して使用する
+            _forcedAttractor = arrived.TargetPlanet != null
+                ? arrived.TargetPlanet
+                : GetNearestAttractor();
+
+            if (_forcedAttractor != null)
+            {
+                // 惑星方向へ初速を与えて飛ばす
+                // GravityAttractor の引力と合わさって自然に引き寄せられる
+                Vector3 toPlanet = (_forcedAttractor.transform.position - _rb.position).normalized;
+                _rb.linearVelocity = toPlanet * gravityJumpForce;
+                Debug.Log($"終点到着。惑星 {_forcedAttractor.gameObject.name} へ発射");
+            }
+            else
+            {
+                _rb.linearVelocity = Vector3.zero;
+            }
+
+            // GroundedLock 開始（着地後の誤発動防止）
+            StartCoroutine(GroundedLockCoroutine(arrived.GroundedLockDuration));
+        }
     }
+
+    // ─────────────────────────────────────────
+    // GroundedLock（終点着地後の保護期間）
+    // ─────────────────────────────────────────
 
     private IEnumerator GroundedLockCoroutine(float duration)
     {
         _isGroundedLocked = true;
         yield return new WaitForSeconds(duration);
         _isGroundedLocked = false;
-        _forcedAttractor = null; // 強制惑星を解放し通常の最寄り判定に戻す
 
-        // ロック解除時点でプレイヤーが物理的に重なっているゾーンを再設定する
-        // これをしないと「到着したゾーン」が残り続けて逆方向に飛んでしまう
-        _currentZone = FindZoneAtCurrentPosition();
+        // 解除前に強制惑星を _currentAttractor に引き継ぐ
+        if (_forcedAttractor != null)
+        {
+            _currentAttractor = _forcedAttractor;
+            _forcedAttractor = null;
+        }
 
-        if (_currentZone != null)
-            Debug.Log($"惑星固定解除。現在のゾーン：{_currentZone.gameObject.name}");
-        else
+        // GroundedLock 解除後、プレイヤーがゾーン内に立っている場合
+        // OnTriggerEnter は再発火しないため、Overlap で現在地のゾーンを取得する
+        // これにより解除後すぐにジャンプ入力しても _currentZone が null にならない
+        if (_currentZone == null)
+        {
+            Collider[] hits = Physics.OverlapSphere(_rb.position, 0.1f);
+            foreach (var col in hits)
+            {
+                GravityJumpZone z = col.GetComponent<GravityJumpZone>();
+                if (z != null)
+                {
+                    _currentZone = z;
+                    Debug.Log($"惑星固定解除。ゾーン再取得：{z.gameObject.name}");
+                    break;
+                }
+            }
+        }
+
+        if (_currentZone == null)
             Debug.Log("惑星固定解除。通常重力に復帰");
-    }
-
-    private void CancelAttraction()
-    {
-        _isBeingAttracted = false;
-        _currentZone = null;
     }
 
     // ─────────────────────────────────────────
@@ -267,25 +266,8 @@ public class GravityBody : MonoBehaviour
     {
         if (_currentZone == null) return false;
         if (_isGroundedLocked) return false;
+        if (_isBeingAttracted) return false;
 
-        // すでに引き寄せ中 → 次のゾーンへ切り替え
-        if (_isBeingAttracted)
-        {
-            GravityJumpZone next = FindNextZone();
-            if (next != null && next != _currentZone)
-            {
-                _currentZone = next;
-                Debug.Log($"次の引力ゾーンへ移動：{next.gameObject.name}");
-            }
-            else
-            {
-                CancelAttraction();
-                Debug.Log("次の引力ゾーンなし。通常重力に復帰");
-            }
-            return true;
-        }
-
-        // 通常状態 → 引き寄せ開始
         _isBeingAttracted = true;
         Vector3 dir = (_currentZone.transform.position - _rb.position).normalized;
         _rb.linearVelocity = dir * gravityJumpForce;
@@ -300,14 +282,31 @@ public class GravityBody : MonoBehaviour
 
     public void OnEnterGravityJumpZone(GravityJumpZone zone)
     {
+        // GroundedLock 中は完全無視
         if (_isGroundedLocked) return;
+
+        if (_isBeingAttracted)
+        {
+            // 飛行中：現在向かっているゾーンの NextZone に一致する場合のみリレー切替
+            if (_currentZone != null && zone == _currentZone.NextZone)
+            {
+                _currentZone = zone;
+                Debug.Log($"TriggerEnter リレー切替 → {zone.gameObject.name}");
+            }
+            return;
+        }
+
+        // 通常状態：侵入ゾーンを登録
         _currentZone = zone;
         Debug.Log($"引力ゾーン侵入：{zone.gameObject.name}");
     }
 
     public void OnExitGravityJumpZone(GravityJumpZone zone)
     {
-        if (_currentZone == zone && !_isBeingAttracted)
+        // 飛行中は Exit を無視（飛行ルートで複数ゾーンをまたぐため）
+        if (_isBeingAttracted) return;
+
+        if (_currentZone == zone)
         {
             _currentZone = null;
             Debug.Log($"引力ゾーン退出：{zone.gameObject.name}");
@@ -315,64 +314,18 @@ public class GravityBody : MonoBehaviour
     }
 
     // ─────────────────────────────────────────
-    // ヘルパーメソッド
+    // ヘルパー
     // ─────────────────────────────────────────
 
     private GravityAttractor GetNearestAttractor()
     {
         GravityAttractor nearest = null;
-
-        // 最小距離比較用変数
         float minDist = float.MaxValue;
-
-        foreach (var attractor in _attractors)
+        foreach (var a in _attractors)
         {
-            float dist = Vector3.Distance(transform.position, attractor.transform.position);
-            if (dist < minDist) { minDist = dist; nearest = attractor; }
+            float d = Vector3.Distance(transform.position, a.transform.position);
+            if (d < minDist) { minDist = d; nearest = a; }
         }
         return nearest;
-    }
-
-    /// <summary>
-    /// 現在ゾーン以外で最寄りの GravityJumpZone を返す
-    /// </summary>
-    private GravityJumpZone FindNextZone()
-    {
-        GravityJumpZone[] zones = FindObjectsByType<GravityJumpZone>(FindObjectsSortMode.None);
-        GravityJumpZone nearest = null;
-        float minDist = float.MaxValue;
-
-        foreach (var z in zones)
-        {
-            if (z == _currentZone) continue;
-            float d = Vector3.Distance(transform.position, z.transform.position);
-            if (d < minDist) { minDist = d; nearest = z; }
-        }
-        return nearest;
-    }
-
-    /// <summary>
-    /// 現在プレイヤーが物理的に重なっているゾーンを返す。
-    /// GroundedLock 解除後の _currentZone 再設定に使用する。
-    /// </summary>
-    private GravityJumpZone FindZoneAtCurrentPosition()
-    {
-        GravityJumpZone[] zones = FindObjectsByType<GravityJumpZone>(FindObjectsSortMode.None);
-
-        foreach (var z in zones)
-        {
-            SphereCollider col = z.GetComponent<SphereCollider>();
-            if (col == null) continue;
-
-            // ワールドスケールを考慮した半径
-            float radius = col.radius * Mathf.Max(
-                z.transform.lossyScale.x,
-                z.transform.lossyScale.y,
-                z.transform.lossyScale.z);
-
-            float dist = Vector3.Distance(_rb.position, z.transform.position);
-            if (dist <= radius) return z;
-        }
-        return null;
     }
 }
