@@ -134,6 +134,9 @@ public class PlayerController : MonoBehaviour
         // 接地判定
         isGrounded = CheckGrounded();
 
+        // gravitybody に接地状態を通知
+        grabody.IsGrounded = isGrounded;
+
         // 床から降りた瞬間：前フレームの床速度を速度から取り除く
         if (prevPlatform != null && _currentPlatform == null)
         {
