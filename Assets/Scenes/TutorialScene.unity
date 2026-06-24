@@ -519,10 +519,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TutorialManager
   steps:
+  - {fileID: 11400000, guid: 22784e0493cdf604fa1337ed57d6fe29, type: 2}
   - {fileID: 11400000, guid: 0a90f54b3d2b21c40950202673f8a020, type: 2}
   - {fileID: 11400000, guid: b96fabe4f032def42b1f754b673dced7, type: 2}
   - {fileID: 11400000, guid: 0c952788be5ee2948b9899b9cc9c8c20, type: 2}
-  - {fileID: 11400000, guid: 22784e0493cdf604fa1337ed57d6fe29, type: 2}
   - {fileID: 11400000, guid: a5abc8deab198f248bb01c67909bc86f, type: 2}
   messageText: {fileID: 757095105}
   uiRoot: {fileID: 1191632496}

@@ -124,3 +124,5 @@ MonoBehaviour:
   zoneName: 
   gizmoColor: {r: 0.2, g: 1, b: 0.4, a: 0.25}
   hideOnReach: 1
+  arrowPrefab: {fileID: 8005418721917326390, guid: b7d50b498c1b3f34087197a17b73e2b7, type: 3}
+  headOffsetOverride: 0
