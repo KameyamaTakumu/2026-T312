@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 452241701}
     m_Modifications:
+    - target: {fileID: 261551132697174131, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 764318875269081833, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_LocalScale.x
       value: 7
@@ -179,6 +183,10 @@ PrefabInstance:
       propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3367725114022841199, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5611331125828709662, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_IsTrigger
       value: 1
@@ -189,7 +197,27 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 5.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneWorldSize.x
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneWorldSize.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneWorldSize.z
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -1064,7 +1092,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -6915,7 +6951,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -7605,7 +7649,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -8481,7 +8533,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -9522,6 +9582,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1697305937}
+    - target: {fileID: 7779646034284805396, guid: bcdb0869d9dab4b4aa38daaa54341250, type: 3}
+      propertyPath: m_VersionIndex
+      value: 620
+      objectReference: {fileID: 0}
     - target: {fileID: 8731914784224575824, guid: bcdb0869d9dab4b4aa38daaa54341250, type: 3}
       propertyPath: spinSwitchGroup
       value: 
@@ -10808,6 +10872,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 511324511}
+    - target: {fileID: 7779646034284805396, guid: bcdb0869d9dab4b4aa38daaa54341250, type: 3}
+      propertyPath: m_VersionIndex
+      value: 620
+      objectReference: {fileID: 0}
     - target: {fileID: 8731914784224575824, guid: bcdb0869d9dab4b4aa38daaa54341250, type: 3}
       propertyPath: spinSwitchGroup
       value: 
@@ -274218,7 +274286,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -275787,7 +275863,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -276288,7 +276372,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -277503,7 +277595,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
@@ -277670,7 +277770,15 @@ PrefabInstance:
       objectReference: {fileID: 1015514778}
     - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: damageZoneOffset
-      value: 5.5
+      value: 0.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6729947362482390377, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
+      propertyPath: damageZoneBaseSize.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 7747284652822938076, guid: 43e6b5e0180674043a1ad13f6f4f7d6d, type: 3}
       propertyPath: m_Name
