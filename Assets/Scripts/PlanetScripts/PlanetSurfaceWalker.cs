@@ -46,8 +46,19 @@ public class PlanetSurfaceWalker : MonoBehaviour
     [CustomLabel("後面ダメージゾーン"), SerializeField]
     private PlatformDamageZone backDamageZone;
 
+    /// <summary>
+    /// 前面・後面ゾーンの配置オフセット（ワールド単位）
+    /// 親スケールの影響を受けない絶対距離で指定する
+    /// </summary>
     [CustomLabel("ダメージゾーンのオフセット距離"), SerializeField]
     private float damageZoneOffset = 0.6f;
+
+    /// <summary>
+    /// ゾーンのワールド空間上のサイズ（幅・高さ・奥行き）
+    /// 親スケールに関わらずこのサイズがそのまま判定範囲になる
+    /// </summary>
+    [CustomLabel("ゾーンサイズ（ワールド単位）"), SerializeField]
+    private Vector3 damageZoneWorldSize = new Vector3(1f, 1.5f, 0.3f);
 
     // ─────────────────────────────────────────
     // 内部参照
@@ -162,7 +173,7 @@ public class PlanetSurfaceWalker : MonoBehaviour
                     rotationSpeed * Time.fixedDeltaTime));
         }
 
-        // ダメージゾーンの位置を進行方向に合わせて更新
+        // ダメージゾーンの位置・サイズを更新
         UpdateDamageZonePositions();
     }
 
@@ -187,7 +198,7 @@ public class PlanetSurfaceWalker : MonoBehaviour
     }
 
     /// <summary>
-    /// ダメージゾーン用子オブジェクトを生成する
+    /// ダメージゾーン用子オブジェクトを生成する。
     /// </summary>
     private PlatformDamageZone CreateDamageZone(string zoneName)
     {
@@ -195,30 +206,68 @@ public class PlanetSurfaceWalker : MonoBehaviour
         obj.transform.SetParent(transform);
         obj.transform.localPosition = Vector3.zero;
 
-        // ダメージ判定用 BoxCollider（IsTrigger=ON）
+        // BoxCollider サイズと localScale は UpdateDamageZonePositions で設定する
         BoxCollider col = obj.AddComponent<BoxCollider>();
         col.isTrigger = true;
-        col.size = new Vector3(1f, 1.5f, 0.3f); // 幅・高さ・奥行き
 
         PlatformDamageZone zone = obj.AddComponent<PlatformDamageZone>();
         return zone;
     }
 
     /// <summary>
-    /// 毎フレーム、前面・後面ゾーンを進行方向に合わせて配置する
+    /// 毎フレーム、前面・後面ゾーンを進行方向に合わせて配置する。
+    ///
+    /// 【スケール対応の仕組み】
+    /// 子は親の子なので、何もしないと親スケールを継承して判定が大きくなる。
+    /// これを防ぐため「子の localScale = 1 / 親の lossyScale」として
+    /// ワールドスケールを (1,1,1) に打ち消し、
+    /// BoxCollider.size に damageZoneWorldSize をそのまま指定することで
+    /// 親スケールに関わらず常に同じワールドサイズの判定を維持する。
+    ///
+    /// オフセットは transform.forward（ワールド方向）に直接掛けるため
+    /// 親スケールの影響を受けない。
     /// </summary>
     private void UpdateDamageZonePositions()
     {
+        // ─────────────────────────────────
+        // 親スケールを打ち消す localScale を計算
+        // ゼロ除算防止のため各成分が 0 に近い場合はスキップしない
+        // （lossyScale に 0 が入るケースは通常ないが念のため保護）
+        // ─────────────────────────────────
+        Vector3 ps = transform.lossyScale;
+        Vector3 counterScale = new Vector3(
+            Mathf.Approximately(ps.x, 0f) ? 1f : 1f / ps.x,
+            Mathf.Approximately(ps.y, 0f) ? 1f : 1f / ps.y,
+            Mathf.Approximately(ps.z, 0f) ? 1f : 1f / ps.z);
+
+        // ─────────────────────────────────
+        // 前面ゾーン：進行方向 (+Z) 側
+        // ─────────────────────────────────
         if (frontDamageZone != null)
         {
-            frontDamageZone.transform.position = transform.position + transform.forward * damageZoneOffset;
+            frontDamageZone.transform.position =
+                transform.position + transform.forward * damageZoneOffset;
             frontDamageZone.transform.rotation = transform.rotation;
+            frontDamageZone.transform.localScale = counterScale;
+
+            BoxCollider col = frontDamageZone.GetComponent<BoxCollider>();
+            if (col != null)
+                col.size = damageZoneWorldSize;
         }
 
+        // ─────────────────────────────────
+        // 後面ゾーン：進行方向 (-Z) 側
+        // ─────────────────────────────────
         if (backDamageZone != null)
         {
-            backDamageZone.transform.position = transform.position - transform.forward * damageZoneOffset;
+            backDamageZone.transform.position =
+                transform.position - transform.forward * damageZoneOffset;
             backDamageZone.transform.rotation = transform.rotation;
+            backDamageZone.transform.localScale = counterScale;
+
+            BoxCollider col = backDamageZone.GetComponent<BoxCollider>();
+            if (col != null)
+                col.size = damageZoneWorldSize;
         }
     }
 
@@ -262,15 +311,22 @@ public class PlanetSurfaceWalker : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
+        // ゾーンサイズはワールド単位固定なので Gizmos.matrix でスケール補正する
+        Matrix4x4 originalMatrix = Gizmos.matrix;
+
         // 前面（赤）
         Gizmos.color = new Color(1f, 0.2f, 0f, 0.6f);
-        Gizmos.DrawCube(transform.position + transform.forward * damageZoneOffset,
-                        new Vector3(1f, 1.5f, 0.3f));
+        Vector3 frontPos = transform.position + transform.forward * damageZoneOffset;
+        Gizmos.matrix = Matrix4x4.TRS(frontPos, transform.rotation, Vector3.one);
+        Gizmos.DrawCube(Vector3.zero, damageZoneWorldSize);
 
         // 後面（青）
         Gizmos.color = new Color(0f, 0.4f, 1f, 0.6f);
-        Gizmos.DrawCube(transform.position - transform.forward * damageZoneOffset,
-                        new Vector3(1f, 1.5f, 0.3f));
+        Vector3 backPos = transform.position - transform.forward * damageZoneOffset;
+        Gizmos.matrix = Matrix4x4.TRS(backPos, transform.rotation, Vector3.one);
+        Gizmos.DrawCube(Vector3.zero, damageZoneWorldSize);
+
+        Gizmos.matrix = originalMatrix;
     }
 #endif
 }
