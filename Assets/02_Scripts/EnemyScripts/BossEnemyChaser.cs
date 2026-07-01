@@ -214,14 +214,24 @@ public class BossEnemyChaser : EnemyBase
     {
         _stateTimer += Time.fixedDeltaTime;
 
-        // 速度を突進方向に維持し続ける（減速防止）
         Vector3 up = transform.up;
+
+        // 突進方向を現在の重力面（接平面）に再投影して曲面に沿わせる
+        Vector3 flatDir = Vector3.ProjectOnPlane(_chargeDirection, up);
+        if (flatDir.sqrMagnitude > 0.0001f)
+        {
+            _chargeDirection = flatDir.normalized;
+        }
+
         Vector3 verticalVel = Vector3.Project(_rb.linearVelocity, up);
         _rb.linearVelocity = _chargeDirection * chargeSpeed + verticalVel;
 
+        // 姿勢も毎フレーム up に合わせて更新する
+        Quaternion targetRot = Quaternion.LookRotation(_chargeDirection, up);
+        _rb.MoveRotation(targetRot);
+
         if (_stateTimer >= chargeMaxDuration)
         {
-            // 何にも当たらず時間切れ → 硬直へ
             EnterRecovering(recoverDuration);
         }
     }
@@ -277,11 +287,6 @@ public class BossEnemyChaser : EnemyBase
             TakeDamage(1);
 
             EnterRecovering(rockHitStunDuration);
-        }
-        else if (!collision.gameObject.CompareTag("Player"))
-        {
-            // 岩以外（壁など）に激突した場合も突進を中断する
-            EnterRecovering(recoverDuration);
         }
     }
 }

@@ -222,6 +222,8 @@ public abstract class EnemyBase : MonoBehaviour
 
         currentHp -= amount;
 
+        Debug.Log($"{gameObject.name} Current HP: {currentHp}");
+
         // Œp³æƒtƒbƒN
         OnDamaged(amount);
 
