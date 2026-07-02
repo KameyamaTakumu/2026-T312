@@ -939,7 +939,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneObject:
-    m_SceneName: TutorialScene
+    m_SceneName: 01_TutorialScene
 --- !u!1 &1619149845
 GameObject:
   m_ObjectHideFlags: 0
@@ -1162,7 +1162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneObject:
-    m_SceneName: GameScene_01
+    m_SceneName: 02_GameScene_01
 --- !u!1 &2066095603
 GameObject:
   m_ObjectHideFlags: 0
