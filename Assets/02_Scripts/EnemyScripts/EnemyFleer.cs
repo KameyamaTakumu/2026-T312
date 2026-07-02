@@ -61,10 +61,9 @@ public class EnemyFleer : MonoBehaviour
 
     [Header("捕獲時の処理")]
 
-    // 捕獲時に表示・カメラ誘導を行うコントローラー
-    // ObjectVisibilityController.Show() がそのまま呼ばれる
-    [CustomLabel("捕獲時に開放するオブジェクト表示制御"), SerializeField]
-    private ObjectVisibilityController revealTarget;
+    // 捕獲時に報告するグループ
+    [CustomLabel("所属する捕獲グループ"), SerializeField]
+    private CaptureGroup captureGroup;
 
     [Header("Gizmo")]
 
@@ -363,12 +362,12 @@ public class EnemyFleer : MonoBehaviour
         // 以降の衝突・更新処理を無効化するためのフラグを立てる
         isCaught = true;
 
-        // 表示・カメラ誘導は ObjectVisibilityController 側に委譲
-        // （このスクリプト自体は「何を表示するか」を知らない設計）
-        if (revealTarget != null)
-            revealTarget.Show();
+        // 捕獲をグループに報告するだけ。
+        // 「何体で開放するか」「何を開放するか」はCaptureGroup側で決める
+        if (captureGroup != null)
+            captureGroup.NotifyCaught();
 
-        // 敵オブジェクト自体を破棄して画面から消す
+        // 敵オブジェクト自体を破棄
         Destroy(gameObject);
     }
 
