@@ -6,6 +6,7 @@ using UnityEngine;
 /// 主な役割：
 /// ・プレイヤー追跡
 /// ・初期位置への帰還
+/// ・原点付近でのランダム徘徊（EnemyBase共通ロジック）
 /// ・惑星表面移動
 /// ・敵向き制御
 /// </summary>
@@ -18,7 +19,7 @@ public class EnemyChaser : EnemyBase
     [CustomLabel("追跡速度"), SerializeField]
     private float chaseSpeed = 4f;
 
-    // 巡回速度
+    // 巡回速度（原点復帰・徘徊の両方で使用）
     [CustomLabel("待機時の巡回速度"), SerializeField]
     private float patrolSpeed = 1.5f;
 
@@ -37,6 +38,8 @@ public class EnemyChaser : EnemyBase
     private bool returnToOrigin = true;
 
     // 原点到達判定距離
+    // これより原点に近ければ「戻り終わった」とみなし、
+    // 以降は（enableWanderがtrueなら）原点周辺での徘徊に切り替わる
     [CustomLabel("原点復帰の許容距離"), SerializeField]
     private float originReachDistance = 0.5f;
 
@@ -58,9 +61,6 @@ public class EnemyChaser : EnemyBase
     // Rigidbody
     private Rigidbody rb;
 
-    // 初期位置
-    private Vector3 originPosition;
-
     // 初期上方向
     // 惑星法線記録用
     private Vector3 originUp;
@@ -69,12 +69,10 @@ public class EnemyChaser : EnemyBase
 
     protected override void Awake()
     {
+        // originPosition の記憶などは EnemyBase.Awake() が行う
         base.Awake();
 
         rb = GetComponent<Rigidbody>();
-
-        // 初期位置保存
-        originPosition = transform.position;
 
         // 初期法線方向保存
         originUp = transform.up;
@@ -122,11 +120,7 @@ public class EnemyChaser : EnemyBase
                 break;
 
             case EnemyState.Patrol:
-
-                // 原点復帰
-                if (returnToOrigin)
-                    UpdateReturnToOrigin();
-
+                UpdatePatrol();
                 break;
         }
     }
@@ -157,6 +151,38 @@ public class EnemyChaser : EnemyBase
             ).normalized;
 
         MoveInDirection(targetDir, chaseSpeed);
+    }
+
+    /// <summary>
+    /// 未検知時の巡回処理
+    ///
+    /// 原点からある程度離れている場合はまず原点へ戻り、
+    /// 原点付近まで戻ってきたら（enableWanderがtrueなら）
+    /// EnemyBase共通の徘徊ロジックで原点周辺をランダムに歩き回る。
+    /// </summary>
+    private void UpdatePatrol()
+    {
+        float distToOrigin =
+            Vector3.Distance(transform.position, originPosition);
+
+        // 原点からまだ遠い場合は原点復帰を優先する
+        if (returnToOrigin && distToOrigin > originReachDistance)
+        {
+            UpdateReturnToOrigin();
+            return;
+        }
+
+        // 原点付近まで戻ってきた（または原点復帰を使わない設定）なら徘徊する
+        if (enableWander)
+        {
+            Vector3 dir = GetWanderDirection();
+
+            // 徘徊目標とほぼ同じ位置なら無駄な移動・回転をしない
+            if (dir.sqrMagnitude < 0.001f)
+                return;
+
+            MoveInDirection(dir, patrolSpeed);
+        }
     }
 
     /// <summary>

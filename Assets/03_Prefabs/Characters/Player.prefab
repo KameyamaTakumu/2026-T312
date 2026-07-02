@@ -2403,7 +2403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c636ad7ebd75704f9bc2d07b46091e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gravityJumpForce: 30
+  gravityJumpForce: 50
 --- !u!114 &6296690243469798018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2428,6 +2428,8 @@ MonoBehaviour:
   cameraTransform: {fileID: 0}
   rotationSpeed: 1
   cameraSmooth: 2
+  cameraTurnSpeed: 120
+  cameraPitch: 20
   cameraHeightOffset: 10
   cameraDepthOffset: -10
 --- !u!114 &1924785547909882285

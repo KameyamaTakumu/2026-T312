@@ -5,7 +5,8 @@ using UnityEngine;
 /// マリオギャラクシー風 追跡＋突進ボス
 ///
 /// 主な役割：
-/// ・プレイヤーを追跡する
+/// ・未検知時は原点周辺を徘徊する（EnemyBase共通ロジック）
+/// ・プレイヤーを検知すると追跡する
 /// ・一定間隔で予備動作 → 突進を行う
 /// ・突進中に岩（RockTag）へ衝突するとダメージを受ける
 /// ・突進失敗後は硬直する
@@ -18,6 +19,7 @@ public class BossEnemyChaser : EnemyBase
 
     private enum BossState
     {
+        Patrolling,  // 徘徊中（プレイヤー未検知）
         Chasing,     // 追跡中
         Telegraph,   // 突進予備動作
         Charging,    // 突進中
@@ -38,6 +40,17 @@ public class BossEnemyChaser : EnemyBase
 
     [CustomLabel("プレイヤーとのこれ以上近づかない距離"), SerializeField]
     private float minChaseDistance = 2.5f;
+
+    [Header("徘徊設定（Boss固有）")]
+
+    // 徘徊時の移動速度
+    // EnemyBase側の徘徊設定（半径・更新間隔など）と組み合わせて使う
+    [CustomLabel("徘徊時の移動速度"), SerializeField]
+    private float patrolSpeed = 2f;
+
+    // 徘徊時の旋回速度
+    [CustomLabel("徘徊時の旋回速度"), SerializeField]
+    private float patrolTurnSpeed = 3f;
 
     [Header("突進設定")]
 
@@ -74,7 +87,10 @@ public class BossEnemyChaser : EnemyBase
     // ─────────────────────────────────────────
 
     private Rigidbody _rb;
-    private BossState _state = BossState.Chasing;
+
+    // 初期状態は徘徊から開始する
+    // （他の敵AIと同様、プレイヤーを検知するまでは追いかけない）
+    private BossState _state = BossState.Patrolling;
 
     private float _chargeTimer = 0f;      // 次の突進までのタイマー
     private float _stateTimer = 0f;       // 各ステート内での経過時間
@@ -102,8 +118,28 @@ public class BossEnemyChaser : EnemyBase
         if (isDead) return;
         if (playerTransform == null) return;
 
+        // ─────────────────────────────────────
+        // Patrolling / Chasing は距離に応じて自動的に切り替える。
+        // 突進系のステート（Telegraph/Charging/Recovering）は
+        // 開始したら距離に関わらず最後まで継続させる。
+        // ─────────────────────────────────────
+        if (_state == BossState.Patrolling || _state == BossState.Chasing)
+        {
+            float distance = Vector3.ProjectOnPlane(
+                playerTransform.position - transform.position,
+                transform.up
+            ).magnitude;
+
+            _state = distance <= chaseRange
+                ? BossState.Chasing
+                : BossState.Patrolling;
+        }
+
         switch (_state)
         {
+            case BossState.Patrolling:
+                UpdatePatrolling();
+                break;
             case BossState.Chasing:
                 UpdateChasing();
                 break;
@@ -117,6 +153,46 @@ public class BossEnemyChaser : EnemyBase
                 UpdateRecovering();
                 break;
         }
+    }
+
+    // ─────────────────────────────────────────
+    // 徘徊ステート（未検知時）
+    // ─────────────────────────────────────────
+
+    /// <summary>
+    /// プレイヤー未検知時、原点周辺をランダムに徘徊する。
+    /// EnemyBase.GetWanderDirection() が方向を、
+    /// ここでは向き・移動速度への反映だけを行う。
+    /// </summary>
+    private void UpdatePatrolling()
+    {
+        Vector3 up = transform.up;
+
+        if (!enableWander)
+        {
+            // 徘徊しない設定の場合は静止（重力方向の速度のみ保持）
+            Vector3 idleVerticalVel = Vector3.Project(_rb.linearVelocity, up);
+            _rb.linearVelocity = idleVerticalVel;
+            return;
+        }
+
+        Vector3 dir = GetWanderDirection();
+
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            // 徘徊目標とほぼ同じ位置：静止
+            Vector3 idleVerticalVel = Vector3.Project(_rb.linearVelocity, up);
+            _rb.linearVelocity = idleVerticalVel;
+            return;
+        }
+
+        // 向きを合わせる
+        Quaternion targetRot = Quaternion.LookRotation(dir, up);
+        _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, targetRot, patrolTurnSpeed * Time.fixedDeltaTime));
+
+        // 移動（重力方向の速度は保持）
+        Vector3 verticalVel = Vector3.Project(_rb.linearVelocity, up);
+        _rb.linearVelocity = dir * patrolSpeed + verticalVel;
     }
 
     // ─────────────────────────────────────────
@@ -257,6 +333,8 @@ public class BossEnemyChaser : EnemyBase
 
         if (!isDead)
         {
+            // 硬直明けは追跡から再開
+            // （距離がすでに離れていれば、次のFixedUpdateでPatrollingへ自動的に戻る）
             _state = BossState.Chasing;
             _stateTimer = 0f;
         }

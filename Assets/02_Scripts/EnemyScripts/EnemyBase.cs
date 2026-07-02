@@ -67,6 +67,26 @@ public abstract class EnemyBase : MonoBehaviour
     [CustomLabel("追跡範囲を可視化"), SerializeField]
     private bool showGizmo = true;
 
+    [Header("徘徊設定")]
+
+    // 未検知時にランダム徘徊するか
+    // falseの場合は継承先の実装次第（その場で静止するなど）
+    [CustomLabel("未検知時にランダム徘徊するか"), SerializeField]
+    protected bool enableWander = true;
+
+    // 徘徊できる原点（初期位置）からの半径
+    [CustomLabel("徘徊可能な原点からの半径"), SerializeField]
+    protected float wanderRadius = 3f;
+
+    // 徘徊目標を選び直す間隔（秒）
+    // 目標地点に到達した場合はこの時間を待たずに更新する
+    [CustomLabel("徘徊目標の更新間隔（秒）"), SerializeField]
+    protected float wanderInterval = 2.5f;
+
+    // 徘徊目標への到達とみなす許容距離
+    [CustomLabel("徘徊目標への到達許容距離"), SerializeField]
+    protected float wanderArriveDistance = 0.3f;
+
     // ─────────────────────────────────────────
     // 内部状態
     // ─────────────────────────────────────────
@@ -87,6 +107,16 @@ public abstract class EnemyBase : MonoBehaviour
 
     [CustomLabel("被ダメージ後の無敵時間（秒）"), SerializeField]
     private float invincibleDuration = 0.5f;
+
+    // 初期位置（徘徊範囲の中心として使用）
+    // サブクラスから参照できるよう protected にしてある
+    protected Vector3 originPosition;
+
+    // 現在の徘徊目標地点（ワールド座標）
+    private Vector3 wanderTarget;
+
+    // 徘徊目標を選んでからの経過時間
+    private float wanderTimer;
 
     // ─────────────────────────────────────────
     // Unity ライフサイクル
@@ -276,6 +306,76 @@ public abstract class EnemyBase : MonoBehaviour
         yield return new WaitForSeconds(invincibleDuration);
 
         invincible = false;
+    }
+
+    // ─────────────────────────────────────────
+    // 徘徊
+    // ─────────────────────────────────────────
+
+    /// <summary>
+    /// 徘徊目標へ向かう方向（惑星面に沿った水平方向、正規化済み）を返す。
+    ///
+    /// 呼び出し側（サブクラス）は、未検知状態のときにこれを呼び、
+    /// 得られた方向を自前の移動処理（MoveInDirection等）へ渡すだけでよい。
+    /// タイマー管理・目標地点の再抽選はこのメソッド内で自動的に行う。
+    ///
+    /// 目標とほぼ同じ位置にいる場合は Vector3.zero を返すので、
+    /// 呼び出し側は sqrMagnitude が十分小さければ移動をスキップしてよい。
+    /// </summary>
+    protected Vector3 GetWanderDirection()
+    {
+        wanderTimer += Time.fixedDeltaTime;
+
+        float distToTarget =
+            Vector3.Distance(transform.position, wanderTarget);
+
+        // 目標へ到達済み、または更新間隔が来たら次の目標を選ぶ
+        if (distToTarget <= wanderArriveDistance
+            || wanderTimer >= wanderInterval)
+        {
+            PickNewWanderTarget();
+            wanderTimer = 0f;
+        }
+
+        Vector3 planetUp = transform.up;
+
+        // 現在地から徘徊目標への方向を、惑星面に沿って計算
+        return Vector3.ProjectOnPlane(
+            wanderTarget - transform.position,
+            planetUp
+        ).normalized;
+    }
+
+    /// <summary>
+    /// 原点を中心とした円内からランダムに徘徊目標を選ぶ
+    /// （惑星の接平面上に投影して求める）
+    /// </summary>
+    private void PickNewWanderTarget()
+    {
+        Vector3 planetUp = transform.up;
+
+        // 接平面（惑星表面）上の基準軸（tangent）を1つ作るための仮の参照ベクトル。
+        // planetUpとほぼ平行（内積が0.9超）な場合、ProjectOnPlaneの結果が
+        // ほぼゼロベクトルになり不安定になるため、その場合は別軸にフォールバックする
+        Vector3 reference = Vector3.forward;
+        if (Mathf.Abs(Vector3.Dot(reference, planetUp)) > 0.9f)
+            reference = Vector3.right;
+
+        // referenceを接平面に投影して正規化したものを軸1（tangent）とする
+        Vector3 tangent =
+            Vector3.ProjectOnPlane(reference, planetUp).normalized;
+        // planetUpとtangentの外積で、接平面上で直交するもう1つの軸（bitangent）を得る
+        Vector3 bitangent =
+            Vector3.Cross(planetUp, tangent).normalized;
+
+        // 半径wanderRadius以内のランダムな2次元座標を取得
+        Vector2 rand = Random.insideUnitCircle * wanderRadius;
+
+        // tangent・bitangentの2軸を使い、接平面上のランダムな点をワールド座標に変換
+        wanderTarget =
+            originPosition
+            + tangent * rand.x
+            + bitangent * rand.y;
     }
 
     // ─────────────────────────────────────────
