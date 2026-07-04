@@ -235,7 +235,8 @@ public class PlayerController : MonoBehaviour
         if (Mathf.Approximately(turn, 0f))
             return;
 
-        Vector3 planetUp = transform.up;
+        //Vector3 planetUp = transform.up;
+        Vector3 planetUp = rb.rotation * Vector3.up;
 
         // D で右旋回、A で左旋回になるよう符号をマイナスにしている
         // （見た目が逆の場合は符号を反転させる）
@@ -260,7 +261,8 @@ public class PlayerController : MonoBehaviour
 
         // GravityBody により transform.up が
         // 惑星法線方向を向いている
-        Vector3 planetUp = transform.up;
+        //Vector3 planetUp = transform.up;
+        Vector3 planetUp = rb.rotation * Vector3.up;
 
         // _camForward は惑星が変わっても常に接線平面上にあるよう補正
         Vector3 camForwardOnPlane =
@@ -387,10 +389,11 @@ public class PlayerController : MonoBehaviour
 
         if (isGrounded)
         {
-            rb.AddForce(
-                transform.up * jumpForce,
-                ForceMode.Impulse
-            );
+            //rb.AddForce(
+            //    transform.up * jumpForce,
+            //    ForceMode.Impulse
+            //);
+            rb.AddForce((rb.rotation * Vector3.up) * jumpForce, ForceMode.Impulse);
 
             // チュートリアルへ通知
             TutorialManager.Instance?.NotifyJump();
@@ -407,8 +410,10 @@ public class PlayerController : MonoBehaviour
         // ─────────────────────────────────
 
         // Collider中心位置
-        Vector3 center =
-            transform.TransformPoint(cap.center);
+        //Vector3 center =
+        //    transform.TransformPoint(cap.center);
+        Vector3 up = rb.rotation * Vector3.up;
+        Vector3 center = rb.position + rb.rotation * cap.center;
 
         // 半径
         // Scale を考慮
@@ -427,8 +432,9 @@ public class PlayerController : MonoBehaviour
             );
 
         // 足元位置
-        Vector3 origin =
-            center - transform.up * height;
+        //Vector3 origin =
+        //    center - transform.up * height;
+        Vector3 origin = center - up * height;
 
         // ─────────────────────────────────
         // SphereCast 接地判定
@@ -441,7 +447,8 @@ public class PlayerController : MonoBehaviour
             radius * 0.95f,
 
             // 惑星下方向
-            -transform.up,
+            //-transform.up,
+            -up,
 
             out RaycastHit hit,
 
@@ -477,7 +484,8 @@ public class PlayerController : MonoBehaviour
             return;
 
         // 惑星法線方向
-        Vector3 planetUp = transform.up;
+        //Vector3 planetUp = transform.up;
+        Vector3 planetUp = rb.rotation * Vector3.up;
 
         // ─────────────────────────────────
         // 位置：_camForward を基準に毎フレーム直接配置（Lerpなし）

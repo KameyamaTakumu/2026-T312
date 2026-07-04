@@ -232,6 +232,8 @@ GameObject:
   - component: {fileID: 140050358366488866}
   - component: {fileID: 7159870417512277218}
   - component: {fileID: 4945448470835774017}
+  - component: {fileID: 3630964474183789556}
+  - component: {fileID: 1376197520603376531}
   m_Layer: 0
   m_Name: Enemy_Chaser_NoStomp
   m_TagString: Untagged
@@ -350,8 +352,44 @@ MonoBehaviour:
   patrolSpeed: 1.5
   stopDistance: 1.2
   rotationSpeed: 8
-  returnToOrigin: 1
-  originReachDistance: 0.5
+  returnToOrigin: 0
+  originReachDistance: 5
+--- !u!95 &3630964474183789556
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2283587718313846152}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 75276a71192e21f4b9b0b1f60158482b, type: 3}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1376197520603376531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2283587718313846152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7742dc9f6ddef014abb6eccc5f90bba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: a0df8e6371e72f24fb600cfe05dfbe88, type: 2}
+  moveBlendSpeed: 8
 --- !u!1 &3512504054498737297
 GameObject:
   m_ObjectHideFlags: 0

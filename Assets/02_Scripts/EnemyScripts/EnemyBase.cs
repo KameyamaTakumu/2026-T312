@@ -125,6 +125,9 @@ public abstract class EnemyBase : MonoBehaviour
     protected virtual void Awake()
     {
         currentHp = maxHp;
+
+        // 徘徊・原点復帰の基準点として、スポーン時の位置を記録する
+        originPosition = transform.position;
     }
 
     protected virtual void OnCollisionEnter(Collision collision)

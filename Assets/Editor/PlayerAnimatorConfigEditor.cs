@@ -18,7 +18,7 @@ using UnityEngine;
 /// デザイナーが AnimatorController を直接編集しなくても
 /// ScriptableObject 上からアニメーション構成を管理できるようにする。
 /// </summary>
-[CustomEditor(typeof(PlayerAnimatorConfig))]
+[CustomEditor(typeof(AnimatorConfig))]
 public class PlayerAnimatorConfigEditor : Editor
 {
     // ── ドライバー登録テーブル ────────────────────────────────────────
@@ -48,6 +48,11 @@ public class PlayerAnimatorConfigEditor : Editor
             "速度閾値 Bool（ダッシュ判定など）",
             "水平速度が設定値を超えたら true を流す Bool ドライバー。\nダッシュアニメーションの切り替えに使う。",
             typeof(SpeedThresholdBoolDriver)
+        ),
+        (
+            "敵の向きに応じた Float（敵の向きに応じて BlendTree）",
+            "敵の向きに応じて -1〜1 の Float を流す。\nBlendTree で左向き・右向きをブレンドするときに使う。",
+            typeof(EnemyMoveDriver)
         ),
     };
 
@@ -82,7 +87,7 @@ public class PlayerAnimatorConfigEditor : Editor
         InitStyles();
         serializedObject.Update();
 
-        var cfg = (PlayerAnimatorConfig)target;
+        var cfg = (AnimatorConfig)target;
 
         // ─── ① ステート定義セクション ───────────────────────────────
         DrawSectionHeader(" ステート定義", "アニメーションの「状態」を追加する");
@@ -120,7 +125,7 @@ public class PlayerAnimatorConfigEditor : Editor
     /// ・削除
     /// を行える。
     /// </summary>
-    void DrawStatesSection(SerializedProperty statesProp, PlayerAnimatorConfig cfg)
+    void DrawStatesSection(SerializedProperty statesProp, AnimatorConfig cfg)
     {
         var stateNames = cfg.States.Select(s => s.StateName).ToArray();
 
@@ -315,7 +320,7 @@ public class PlayerAnimatorConfigEditor : Editor
     /// SerializeReferenceを利用して
     /// 複数種類のドライバーを同じリストで管理する。
     /// </summary>
-    void DrawDriversSection(SerializedProperty listProp, PlayerAnimatorConfig cfg)
+    void DrawDriversSection(SerializedProperty listProp, AnimatorConfig cfg)
     {
         for (int i = 0; i < listProp.arraySize; i++)
         {
@@ -391,7 +396,7 @@ public class PlayerAnimatorConfigEditor : Editor
 
     // ── ドライバー選択ウィンドウ（説明付きリスト） ───────────────────
 
-    void ShowDriverPickerWindow(SerializedProperty listProp, PlayerAnimatorConfig cfg)
+    void ShowDriverPickerWindow(SerializedProperty listProp, AnimatorConfig cfg)
     {
         var menu = new GenericMenu();
         foreach (var (label, description, type) in DriverTypes)
@@ -513,7 +518,7 @@ public class PlayerAnimatorConfigEditor : Editor
     /// </summary>
     AnimatorParameterTypeEnum InferParamType(string paramName)
     {
-        var cfg = (PlayerAnimatorConfig)target;
+        var cfg = (AnimatorConfig)target;
         foreach (var d in cfg.ParameterDrivers)
             if (d != null && d.ParameterName == paramName)
                 return d.ParameterType;

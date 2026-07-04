@@ -2426,7 +2426,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   cameraTransform: {fileID: 0}
-  rotationSpeed: 1
+  rotationSpeed: 100
   cameraSmooth: 2
   cameraTurnSpeed: 120
   cameraPitch: 20

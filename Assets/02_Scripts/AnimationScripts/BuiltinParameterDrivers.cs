@@ -8,7 +8,7 @@ using UnityEngine;
 //    1. AnimatorParameterDriver を継承したクラスをここに追加
 //    2. [System.Serializable] を付ける
 //    3. Drive(DriveContext ctx) を実装する
-//    4. PlayerAnimatorConfigEditor.cs の DriverTypes に 1 行追加する
+//    4. AnimatorConfigEditor.cs の DriverTypes に 1 行追加する
 //
 //  基底クラスのヘルパーを使うと短く書けます：
 //    HorizontalVelocity(ctx)        → 水平速度ベクトル
@@ -217,6 +217,31 @@ public class SpeedThresholdBoolDriver : AnimatorParameterDriver
     public override void Drive(DriveContext ctx)
     {
         SetBool(ctx, HorizontalVelocity(ctx).magnitude > Threshold);
+    }
+}
+
+/// <summary>
+/// 敵の移動速度を Animator の Float パラメータへ送るドライバー。
+/// 
+/// 敵の移動速度を取得し、0～1 の範囲に正規化して Animator へ渡す。
+/// 
+/// 主な用途：
+/// ・敵の移動アニメーション制御
+/// ・ 敵の速度に応じたアニメーションブレンド
+/// ・ 敵の移動状態に応じたアニメーション遷移
+/// </summary>
+[System.Serializable]
+public class EnemyMoveDriver : AnimatorParameterDriver
+{
+    public float MaxSpeed = 2f;
+
+    public override void Drive(DriveContext ctx)
+    {
+        float speed = HorizontalVelocity(ctx).magnitude;
+
+        float value = Mathf.Clamp01(speed / MaxSpeed);
+
+        SetFloatSmooth(ctx, value);
     }
 }
 
