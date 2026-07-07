@@ -12,6 +12,10 @@ public class GravityAttractor : MonoBehaviour
     [CustomLabel("重力の強さ"), SerializeField]
     private float gravity = -9.81f;
 
+    [Header("BGM設定")]
+    [CustomLabel("到着時惑星BGM"), SerializeField]
+    private BGM planetBGM = BGM.None;
+
     /// <summary>
     /// Rigidbody に重力適用
     /// </summary>
@@ -41,5 +45,23 @@ public class GravityAttractor : MonoBehaviour
 
         // gravity が負なので中心方向へ引っ張られる
         body.AddForce(gravityUp * gravity);
+    }
+
+    /// <summary>
+    /// 惑星到着時のBGM再生
+    /// </summary>
+    public void PlayPlanetBGM()
+    {
+        if (SoundManager.Instance == null)
+            return;
+
+        // Noneなら停止
+        if (planetBGM == BGM.None)
+        {
+            SoundManager.Instance.StopBGM();
+            return;
+        }
+
+        SoundManager.Instance.PlayBGM(planetBGM);
     }
 }

@@ -242,7 +242,26 @@ public class PlanetWarpManager : MonoBehaviour
         if (travelUI != null)
             travelUI.PlayLandEffect();
 
+        PlayPlanetBGM(targetPlanet);
+
         IsTraveling = false;
+    }
+
+    /// <summary>
+    /// 指定した惑星のBGMを再生
+    /// </summary>
+    public void PlayPlanetBGM(Transform planet)
+    {
+        if (planet == null)
+            return;
+
+        GravityAttractor attractor =
+            planet.GetComponent<GravityAttractor>();
+
+        if (attractor != null)
+        {
+            attractor.PlayPlanetBGM();
+        }
     }
 
     /// <summary>

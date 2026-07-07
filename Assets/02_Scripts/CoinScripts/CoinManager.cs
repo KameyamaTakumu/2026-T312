@@ -15,8 +15,11 @@ public class CoinManager : MonoBehaviour
     public static CoinManager Instance { get; private set; }
 
     // 現在の所持コイン枚数
-    [CustomLabel("現在のコイン枚数（確認用）"), SerializeField]
+    [CustomLabel("現在のコイン枚数"), SerializeField]
     private int coinCount = 0;
+    // プレイヤーが所持できる最大コイン数
+    [CustomLabel("最大所持コイン数"), SerializeField]
+    private int maxCoinCount = 99;
 
     // 所持枚数表示用 UI
     [CustomLabel("コイン枚数 UIテキスト（TMP）"), SerializeField]
@@ -50,6 +53,9 @@ public class CoinManager : MonoBehaviour
         // amount が負でも 0 扱いになる
         coinCount += Mathf.Max(0, amount);
 
+        // 上限を超えないように加算
+        coinCount = Mathf.Min(coinCount + amount, maxCoinCount);
+
         // UI 更新
         UpdateUI();
     }
@@ -82,6 +88,6 @@ public class CoinManager : MonoBehaviour
     {
         // UI 未設定対策
         if (coinText != null)
-            coinText.text = $"× {coinCount}";
+            coinText.text = $"× {coinCount:00}";
     }
 }

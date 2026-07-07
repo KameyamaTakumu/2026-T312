@@ -48,6 +48,9 @@ public class GravityBody : MonoBehaviour
     // GroundedLock 中に使用する強制惑星
     private GravityAttractor _forcedAttractor = null;
 
+    [SerializeField] private bool controlsBGM = false; // Inspectorでプレイヤーのみtrueに
+    private GravityAttractor _lastBGMAttractor; // 直前にBGMを鳴らした惑星
+
     // ─────────────────────────────────────────
     // 公開プロパティ
     // ─────────────────────────────────────────
@@ -129,6 +132,13 @@ public class GravityBody : MonoBehaviour
         {
             _currentAttractor = target;
             target.Attract(_rb);
+
+            // 惑星が変わった時だけBGMを鳴らす
+            if (controlsBGM && _currentAttractor != _lastBGMAttractor)
+            {
+                _currentAttractor.PlayPlanetBGM();
+                _lastBGMAttractor = _currentAttractor;
+            }
         }
     }
 

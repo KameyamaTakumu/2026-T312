@@ -248,12 +248,13 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// プレイヤー移動処理（Wキーのみで前進）
+    /// プレイヤー移動処理
     /// </summary>
     void HandleMove()
     {
-        // 前進入力（Wキーのみ。A/D/Sは移動に使用しない）
-        bool moveInput = Input.GetKey(KeyCode.W);
+        // 前進入力
+        bool moveInputW = Input.GetKey(KeyCode.W);
+        bool moveInputS = Input.GetKey(KeyCode.S);
 
         // ─────────────────────────────────
         // 惑星上方向
@@ -284,7 +285,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // 入力なし（Wが押されていない）→ 水平速度を減速して return
-        if (!moveInput)
+        if (!moveInputW && !moveInputS)
         {
             Vector3 vel = rb.linearVelocity;
             Vector3 vVel = Vector3.Project(vel, planetUp);
@@ -306,13 +307,25 @@ public class PlayerController : MonoBehaviour
         }
 
         // 地上で入力あり → 走り中としてチュートリアルへ通知
-        if (isGrounded)
+        //if (isGrounded)
+        //    TutorialManager.Instance?.NotifyRunning(Time.fixedDeltaTime);
+        if (isGrounded && (moveInputW || moveInputS))
             TutorialManager.Instance?.NotifyRunning(Time.fixedDeltaTime);
 
         // ─────────────────────────────────
         // 移動方向 = カメラ前方向（Wキーのみなので常に前進）
         // ─────────────────────────────────
-        Vector3 moveDir = _camForward;
+        //Vector3 moveDir = _camForward;
+        Vector3 moveDir = Vector3.zero;
+
+        if (moveInputW)
+        {
+            moveDir = _camForward;
+        }
+        else if (moveInputS)
+        {
+            moveDir = -_camForward;
+        }
 
         // ─────────────────────────────────
         // プレイヤー回転

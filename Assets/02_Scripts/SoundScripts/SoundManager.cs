@@ -41,9 +41,10 @@
  *========================================================
 */
 
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections;
+using UnityEngine.Audio;
 
 #region BGM Enum
 
@@ -54,7 +55,11 @@ using System.Collections;
 /// </summary>
 public enum BGM
 {
-    Test_BGM,
+    None = -1,
+
+    Planet1,
+    Planet2,
+    Planet3
 }
 
 #endregion
@@ -68,7 +73,7 @@ public enum BGM
 /// </summary>
 public enum SE
 {
-    Test_SE,
+    None = -1,
 }
 
 #endregion
@@ -211,6 +216,9 @@ public class SoundManager : MonoBehaviour
     public void PlayBGM(BGM index)
     {
         int idx = (int)index;
+
+        // åªç›çƒê∂Ç≥ÇÍÇƒÇ¢ÇÈBGM
+        Debug.Log($"Current BGM Index: {currentBGMIndex}, Requested BGM Index: {idx}");
 
         // ìØÇ∂BGMçƒê∂íÜÇ»ÇÁâΩÇ‡ÇµÇ»Ç¢
         if (currentBGMIndex == idx &&

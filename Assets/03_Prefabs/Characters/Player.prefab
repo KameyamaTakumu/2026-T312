@@ -2429,7 +2429,7 @@ MonoBehaviour:
   rotationSpeed: 100
   cameraSmooth: 2
   cameraTurnSpeed: 120
-  cameraPitch: 20
+  cameraPitch: 45
   cameraHeightOffset: 10
   cameraDepthOffset: -10
 --- !u!114 &1924785547909882285
@@ -2466,7 +2466,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 748d02a026d50c24ab13b06027583f2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 8
+  maxHp: 5
   invincibleDuration: 1.5
   hpText: {fileID: 0}
 --- !u!1 &8885919156744570658

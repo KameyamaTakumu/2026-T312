@@ -200,7 +200,7 @@ public class PlayerHealth : MonoBehaviour
         if (hpText != null)
         {
             hpText.text =
-                $"HP: {CurrentHp} / {maxHp}";
+                $"LIFE: {CurrentHp} / {maxHp}";
         }
     }
 }
