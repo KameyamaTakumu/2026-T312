@@ -614,6 +614,8 @@ GameObject:
   - component: {fileID: 5267063174393799198}
   - component: {fileID: 1067690047784366665}
   - component: {fileID: 507761065922787154}
+  - component: {fileID: -1685814123274313156}
+  - component: {fileID: -6358489548700591198}
   m_Layer: 0
   m_Name: BossEnemy_Chaser
   m_TagString: Untagged
@@ -701,6 +703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityJumpForce: 12
+  controlsBGM: 0
 --- !u!114 &507761065922787154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -722,10 +725,16 @@ MonoBehaviour:
   damageToPlayer: 1
   chaseRange: 10
   showGizmo: 1
+  enableWander: 1
+  wanderRadius: 3
+  wanderInterval: 2.5
+  wanderArriveDistance: 0.3
   invincibleDuration: 0.5
   chaseSpeed: 4
   turnSpeed: 4
   minChaseDistance: 2.5
+  patrolSpeed: 2
+  patrolTurnSpeed: 3
   chargeInterval: 4
   telegraphDuration: 0.8
   chargeSpeed: 14
@@ -734,6 +743,42 @@ MonoBehaviour:
   rockHitStunDuration: 1.5
   rockTag: Rock
   playerTransform: {fileID: 0}
+--- !u!95 &-1685814123274313156
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3519125177220622748}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 3d532271a1f4655488cd0768acd23525, type: 3}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-6358489548700591198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3519125177220622748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7742dc9f6ddef014abb6eccc5f90bba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: b5f22b7e9dff38843a2b243a86242faa, type: 2}
+  moveBlendSpeed: 8
 --- !u!1 &3744114489374124832
 GameObject:
   m_ObjectHideFlags: 0

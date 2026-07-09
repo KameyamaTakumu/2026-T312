@@ -307,7 +307,14 @@ MonoBehaviour:
   bgmSource: {fileID: 617888682222393076}
   seSource: {fileID: 2482025674701372722}
   bgmList:
+  - {fileID: 8300000, guid: 3c09fd2a8c71c98488c88b2e0692641d, type: 3}
   - {fileID: 8300000, guid: cdedb402f196fc64397d6dbacc640bc2, type: 3}
+  - {fileID: 8300000, guid: 19265528ff6344d4f9bed0552fc88312, type: 3}
+  - {fileID: 8300000, guid: be9ad2b59aa3aff4688fce1a2607ffd2, type: 3}
+  - {fileID: 8300000, guid: da98e3e46a5eea7489ecde5d0ea83920, type: 3}
+  - {fileID: 0}
   seList:
+  - {fileID: 8300000, guid: 730a4c571b8c6d447b6595ba9786013f, type: 3}
+  - {fileID: 8300000, guid: ab3d1296a8da33a4baea19afcab1b4c5, type: 3}
   - {fileID: 0}
   fadeTime: 1

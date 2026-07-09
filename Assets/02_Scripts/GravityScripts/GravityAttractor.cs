@@ -12,9 +12,16 @@ public class GravityAttractor : MonoBehaviour
     [CustomLabel("重力の強さ"), SerializeField]
     private float gravity = -9.81f;
 
+    [Header("リスポーン設定")]
+    [CustomLabel("この惑星のリスポーン地点"), SerializeField]
+    private Transform respawnPoint;
+
     [Header("BGM設定")]
     [CustomLabel("到着時惑星BGM"), SerializeField]
     private BGM planetBGM = BGM.None;
+
+    // 外部から参照だけ許可
+    public Transform RespawnPoint => respawnPoint;
 
     /// <summary>
     /// Rigidbody に重力適用
@@ -55,10 +62,9 @@ public class GravityAttractor : MonoBehaviour
         if (SoundManager.Instance == null)
             return;
 
-        // Noneなら停止
+        // Noneなら継続
         if (planetBGM == BGM.None)
         {
-            SoundManager.Instance.StopBGM();
             return;
         }
 

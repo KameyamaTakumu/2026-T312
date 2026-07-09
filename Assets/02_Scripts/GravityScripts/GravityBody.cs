@@ -139,6 +139,10 @@ public class GravityBody : MonoBehaviour
                 _currentAttractor.PlayPlanetBGM();
                 _lastBGMAttractor = _currentAttractor;
             }
+
+            // リスポーン地点更新（未設定ならメソッド内でreturnされ現状維持）
+            if (RespawnManager.Instance != null)
+                RespawnManager.Instance.SetRespawnPoint(_currentAttractor.RespawnPoint);
         }
     }
 
@@ -337,5 +341,18 @@ public class GravityBody : MonoBehaviour
             if (d < minDist) { minDist = d; nearest = a; }
         }
         return nearest;
+    }
+
+    public void ForceSyncGravity()
+    {
+        if (_attractors == null || _attractors.Length == 0)
+            _attractors = FindObjectsByType<GravityAttractor>(FindObjectsSortMode.None);
+
+        GravityAttractor nearest = GetNearestAttractor();
+        if (nearest != null)
+        {
+            _currentAttractor = nearest;
+            nearest.Attract(_rb);
+        }
     }
 }

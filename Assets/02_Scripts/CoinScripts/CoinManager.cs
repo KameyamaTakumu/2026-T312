@@ -49,12 +49,10 @@ public class CoinManager : MonoBehaviour
     /// </summary>
     public void AddCoins(int amount)
     {
-        // マイナス加算防止
-        // amount が負でも 0 扱いになる
-        coinCount += Mathf.Max(0, amount);
-
         // 上限を超えないように加算
         coinCount = Mathf.Min(coinCount + amount, maxCoinCount);
+
+        SE.CoinGet.Play();
 
         // UI 更新
         UpdateUI();

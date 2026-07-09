@@ -6,6 +6,20 @@ public class SceneChanger : MonoBehaviour
 
     public void ButtonChangeScene()
     {
+        if (ScreenFader.Instance != null)
+        {
+            // 丸く閉じる → 閉じきったらシーンリロード
+            ScreenFader.Instance.FadeOut(LoadScene);
+        }
+        else
+        {
+            LoadScene();
+        }
+    }
+
+    private void LoadScene() 
+    {
+
         sceneObject.Load();
     }
 }

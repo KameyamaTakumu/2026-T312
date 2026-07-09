@@ -1933,6 +1933,8 @@ GameObject:
   - component: {fileID: 7178981332863369364}
   - component: {fileID: 7613676890204711731}
   - component: {fileID: 1039979785465974435}
+  - component: {fileID: 6299236371833759235}
+  - component: {fileID: -3283573107740004830}
   m_Layer: 0
   m_Name: Enemy_Escape
   m_TagString: Untagged
@@ -2020,6 +2022,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityJumpForce: 12
+  controlsBGM: 0
 --- !u!114 &1039979785465974435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2043,6 +2046,42 @@ MonoBehaviour:
   wanderArriveDistance: 0.3
   captureGroup: {fileID: 0}
   showGizmo: 1
+--- !u!95 &6299236371833759235
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8426200290136367504}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: fad5a0ce624055a45b7771b626e64e96, type: 3}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-3283573107740004830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8426200290136367504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7742dc9f6ddef014abb6eccc5f90bba8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: 78ba7437404208e42ab4daee3b62cf55, type: 2}
+  moveBlendSpeed: 8
 --- !u!1 &8536060472565242120
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,12 +4,14 @@ using UnityEngine.Events;
 /// <summary>
 /// チュートリアルの1ステップ分の設定を保持する ScriptableObject
 ///
-/// TutorialManager がこのデータを順番に読み込み、
-/// 指定された条件を満たしたら次のステップへ進行する
+/// TutorialManager がこのデータを読み込み、
+/// 指定された条件を満たしたら選択リストへ戻る
 ///
 /// 主な用途
+/// ・選択ボタンに表示する名前
 /// ・表示するメッセージ
 /// ・クリア条件
+/// ・プレイヤーの出現位置・回転（このステップ専用の固定位置）
 /// ・ステップ開始時に出現させるオブジェクト
 /// ・GoalZone の設定
 /// ・開始時／完了時イベント
@@ -17,6 +19,16 @@ using UnityEngine.Events;
 [CreateAssetMenu(fileName = "TutorialStep", menuName = "Tutorial/TutorialStep")]
 public class TutorialStep : ScriptableObject
 {
+    // ─────────────────────────────────────────
+    // 選択リスト表示設定
+    // ─────────────────────────────────────────
+
+    [Header("選択リスト表示設定")]
+    // 選択画面のボタンに表示する名前
+    // 例：「ジャンプの練習」「スピンで敵を倒す」など
+    [CustomLabel("ステップ名（選択ボタンのラベル）")]
+    public string stepName = "ステップ";
+
     // ─────────────────────────────────────────
     // 表示設定
     // ─────────────────────────────────────────
@@ -27,6 +39,20 @@ public class TutorialStep : ScriptableObject
     [CustomLabel("表示するメッセージ")]
     [TextArea(2, 5)]
     public string message = "表示するメッセージをここに書いてください。";
+
+    // ─────────────────────────────────────────
+    // プレイヤー出現設定
+    // ─────────────────────────────────────────
+
+    [Header("プレイヤー出現設定")]
+    // このステップ開始時にプレイヤーをテレポートさせる座標
+    // ステップごとに固定の位置をあらかじめ設定しておく
+    [CustomLabel("プレイヤー出現座標")]
+    public Vector3 playerSpawnPosition;
+
+    // このステップ開始時にプレイヤーへ設定する回転（オイラー角）
+    [CustomLabel("プレイヤー出現回転（オイラー角）")]
+    public Vector3 playerSpawnRotation;
 
     // ─────────────────────────────────────────
     // クリア条件
@@ -73,6 +99,29 @@ public class TutorialStep : ScriptableObject
     // TutorialManager が蓄積時間を管理する
     [CustomLabel("走る必要がある合計時間（秒）")]
     public float runRequiredTime = 3.0f;
+
+    // ─────────────────────────────────────────
+    // 回数設定
+    // ─────────────────────────────────────────
+
+    [Header("回数設定（Jump / Spin / SpinHitEnemy 条件時）")]
+
+    // Jump・Spin・SpinHitEnemy でクリアに必要な回数
+    // 1のままなら従来通り1回で即クリア
+    [CustomLabel("クリアに必要な回数")]
+    public int requiredCount = 1;
+
+    // ─────────────────────────────────────────
+    // クリア演出設定
+    // ─────────────────────────────────────────
+
+    [Header("クリア演出設定")]
+
+    // クリア条件を満たした直後に表示するメッセージ
+    // 空の場合は message をそのまま表示し続ける
+    [CustomLabel("クリア時に表示するメッセージ")]
+    [TextArea(2, 3)]
+    public string clearMessage = "クリア！";
 
     // ─────────────────────────────────────────
     // オブジェクト出現設定

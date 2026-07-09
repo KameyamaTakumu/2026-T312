@@ -284,7 +284,7 @@ public class EnemyChaser : EnemyBase
 
     protected override void OnDeath()
     {
-        // €–Sˆ—
+        TutorialManager.Instance?.NotifySpinHitEnemy();
     }
 
 #if UNITY_EDITOR

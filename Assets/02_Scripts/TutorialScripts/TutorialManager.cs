@@ -3,30 +3,73 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Cinemachine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>
-/// チュートリアル全体の進行を管理するシングルトン
+/// チュートリアル選択リストの進行を管理するシングルトン
 ///
 /// 主な役割：
-/// ・TutorialStep リストを順番に実行
-/// ・クリア条件（Jump / Spin / Run / ReachGoalZone など）の受付と判定
-/// ・UI（メッセージ・進行度テキスト・ゲージ）の更新
+/// ・ステップ数分の選択ボタンを生成し、プレイヤーが好きなステップを選べるようにする
+/// ・選択されたステップ単体を実行（クリア条件の受付・判定）
+/// ・UI（メッセージ・ステップ名・ゲージ）の更新
 /// ・ステップごとのオブジェクト出現・消去
 /// ・GoalZone の有効化・無効化
+/// ・プレイヤーの出現（テレポート）・非表示
 /// </summary>
 public class TutorialManager : MonoBehaviour
 {
     public static TutorialManager Instance { get; private set; }
+
+    // 現在の進行モード
+    private enum TutorialMode
+    {
+        Selecting, // 選択リスト表示中
+        Playing,   // いずれかのステップを実行中
+    }
 
     // ─────────────────────────────────────────
     // インスペクタ設定
     // ─────────────────────────────────────────
 
     [Header("ステップ設定")]
-    // 実行するチュートリアルの手順一覧
-    // 上から順に処理されるため、並び順がそのまま進行順になる
-    [CustomLabel("ステップリスト（順番に実行）"), SerializeField]
+    // 選択リストに並べるチュートリアルの手順一覧
+    // 上から順にボタンとして並ぶ
+    [CustomLabel("ステップリスト（選択ボタンの並び順）"), SerializeField]
     private List<TutorialStep> steps = new List<TutorialStep>();
+
+    [Header("ステップ選択リストUI")]
+    // 選択ボタンを並べた画面全体のルート（非表示切替用）
+    [CustomLabel("選択リストUIルート"), SerializeField]
+    private GameObject selectionUIRoot;
+
+    // ボタンを並べる親オブジェクト（Vertical/Grid Layout Group 推奨）
+    [CustomLabel("ボタンを並べる親オブジェクト"), SerializeField]
+    private Transform buttonContainer;
+
+    // ステップ選択ボタンのプレハブ（子に TMP_Text を持つ Button）
+    [CustomLabel("ステップ選択ボタンのプレハブ"), SerializeField]
+    private Button stepButtonPrefab;
+
+    [Header("プレイヤー")]
+    // チュートリアル用プレイヤー（シーン内オブジェクトを直接アサイン推奨）
+    // 未設定の場合は Tag "Player" で自動検索する
+    [CustomLabel("プレイヤーオブジェクト"), SerializeField]
+    private GameObject player;
+
+    [Header("カメラ設定（Cinemachine）")]
+    // 選択画面表示中に使う固定カメラ（初期位置に据え置くカメラ）
+    [CustomLabel("選択画面用の固定カメラ"), SerializeField]
+    private CinemachineCamera selectionCamera;
+
+    // 選択画面表示中の優先度（プレイヤー追従カメラより高い値にする）
+    [CustomLabel("選択画面カメラ：表示中の優先度"), SerializeField]
+    private int selectionCameraActivePriority = 20;
+
+    // ステップ実行中の優先度（プレイヤー追従カメラより低い値にする）
+    [CustomLabel("選択画面カメラ：ステップ実行中の優先度"), SerializeField]
+    private int selectionCameraInactivePriority = 0;
 
     [Header("UI")]
     // 画面上に表示する説明テキスト
@@ -34,14 +77,13 @@ public class TutorialManager : MonoBehaviour
     [CustomLabel("メッセージテキスト（TMP）"), SerializeField]
     private TMP_Text messageText;
 
-    // チュートリアルUI全体の親オブジェクト
-    // チュートリアル開始時に表示し、完了後に非表示にする
-    [CustomLabel("チュートリアルUIルート（非表示切替用）"), SerializeField]
+    // チュートリアル実行中UI全体の親オブジェクト（選択リストとは別）
+    [CustomLabel("チュートリアル実行中UIルート"), SerializeField]
     private GameObject uiRoot;
 
-    // 現在のステップ番号を示すテキスト（例：1/10）
-    [CustomLabel("ステップ進行度テキスト（TMP）例：1/10）"), SerializeField]
-    private TMP_Text stepCountText;
+    // 現在実行中のステップ名を表示するテキスト
+    [CustomLabel("ステップ名テキスト（TMP）"), SerializeField]
+    private TMP_Text stepTitleText;
 
     // Run 条件ステップのみ表示するゲージ全体の親オブジェクト
     // 他の条件では自動で非表示になる
@@ -54,33 +96,28 @@ public class TutorialManager : MonoBehaviour
     private Slider gaugeSlider;
 
     [Header("タイミング設定")]
-    // 最初のステップ開始前に挟む待機時間
-    // 画面遷移直後に急に表示されないよう余裕を持たせる
+    // ステップ選択後、実際にクリア判定を始めるまでの待機時間
+    // 画面遷移直後に急に判定が始まらないよう余裕を持たせる
     [CustomLabel("ステップ開始前の待機時間（秒）"), SerializeField]
     private float stepStartDelay = 0.5f;
 
-    // 1 ステップ完了メッセージを表示してから次へ進むまでの時間
-    // プレイヤーが完了を認識できるよう短い間を置く
-    [CustomLabel("ステップ完了後の待機時間（秒）"), SerializeField]
-    private float stepCompleteDelay = 1.0f;
+    // クリアメッセージを表示してから選択リストへ戻るまでの待機時間
+    // ここを長くするほど、クリア後に即座に選択画面へ戻らなくなる
+    [CustomLabel("クリア後、選択画面に戻るまでの待機時間（秒）"), SerializeField]
+    private float stepCompleteDelay = 2.0f;
 
-    // 全ステップ完了時に表示するメッセージ
-    [CustomLabel("チュートリアル完了メッセージ"), SerializeField]
-    private string completeMessage = "チュートリアル完了！";
+    [SerializeField] Volume globalVolume;
 
-    // 完了メッセージを表示してから UI を非表示にするまでの時間
-    [CustomLabel("完了後にUIを非表示にするまでの時間（秒）"), SerializeField]
-    private float hideUIDelay = 3.0f;
+    private DepthOfField depthOfField;
 
     // ─────────────────────────────────────────
     // 内部状態
     // ─────────────────────────────────────────
 
-    // 現在処理中のステップ番号（-1 = まだ開始していない）
-    private int _currentStepIndex = -1;
+    private TutorialMode _mode = TutorialMode.Selecting;
 
-    // チュートリアルが進行中かどうか
-    private bool _isRunning = false;
+    // 現在処理中のステップ番号（-1 = 選択画面中で未選択）
+    private int _currentStepIndex = -1;
 
     // クリア処理の二重実行を防ぐフラグ
     // TryClearStep が同一ステップで複数回呼ばれても一度しか走らないようにする
@@ -97,6 +134,9 @@ public class TutorialManager : MonoBehaviour
     // Run ステップ用：プレイヤーが走り続けた累積時間（秒）
     private float _runAccumulatedTime = 0f;
 
+    // Jump / Spin / SpinHitEnemy ステップ用：現在の達成回数
+    private int _actionCount = 0;
+
     // 各通知メソッドから参照するプレイヤーコンポーネント
     private PlayerController _playerController;
     private PlayerSpin _playerSpin;
@@ -106,9 +146,10 @@ public class TutorialManager : MonoBehaviour
     // ─────────────────────────────────────────
 
     public int CurrentStepIndex => _currentStepIndex;
-    public bool IsRunning => _isRunning;
+    public bool IsPlayingStep => _mode == TutorialMode.Playing;
 
     // 範囲外アクセスを避けつつ現在の TutorialStep を返す
+    // 選択画面中（_currentStepIndex == -1）は null を返す
     public TutorialStep CurrentStep =>
         (_currentStepIndex >= 0 && _currentStepIndex < steps.Count)
         ? steps[_currentStepIndex] : null;
@@ -126,74 +167,129 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
-        // タグ "Player" でプレイヤーを自動検索し、必要なコンポーネントを取得
-        // 手動でアサインする手間を省くための自動参照
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        // 未アサインならタグ "Player" でプレイヤーを自動検索する
+        if (player == null)
+            player = GameObject.FindGameObjectWithTag("Player");
+
         if (player != null)
         {
             _playerController = player.GetComponent<PlayerController>();
             _playerSpin = player.GetComponent<PlayerSpin>();
         }
 
+        globalVolume.profile.TryGet(out depthOfField);
+        if (depthOfField == null)
+            Debug.LogError("DepthOfField is not found in the global volume");
+
+        SwitchDepthOfField(true);
+
+        BGM.Tutorial.Play();
+
         // メッセージを初期化しておく
         ShowMessage("");
 
-        // 開始前は UI を非表示にしておく
+        // 実行中UIはまだ不要なので非表示
         if (uiRoot != null) uiRoot.SetActive(false);
         if (gaugeRoot != null) gaugeRoot.SetActive(false);
 
-        // ステップが登録されていれば自動でチュートリアルを開始
-        if (steps.Count > 0)
-            StartCoroutine(StartTutorial());
+        // 選択画面開始時点ではプレイヤーは非表示にしておく
+        HidePlayer();
+
+        // カメラは選択画面用の固定カメラに合わせておく
+        ActivateSelectionCamera();
+
+        // ステップ数分の選択ボタンを生成して選択画面を表示する
+        BuildSelectionButtons();
+        if (selectionUIRoot != null) selectionUIRoot.SetActive(true);
     }
 
     // ─────────────────────────────────────────
-    // チュートリアル進行
+    // 選択リストUI
     // ─────────────────────────────────────────
 
     /// <summary>
-    /// チュートリアルを開始するコルーチン
-    ///
-    /// 開始ディレイを挟んでから最初のステップへ進む
+    /// steps の内容をもとに選択ボタンを生成する
+    /// 既存のボタンがあれば一度破棄してから作り直す
     /// </summary>
-    private IEnumerator StartTutorial()
+    private void BuildSelectionButtons()
     {
-        _isRunning = true;
-        if (uiRoot != null) uiRoot.SetActive(true);
+        if (buttonContainer == null || stepButtonPrefab == null) return;
 
-        yield return new WaitForSeconds(stepStartDelay);
-        AdvanceToStep(0);
-    }
+        foreach (Transform child in buttonContainer)
+            Destroy(child.gameObject);
 
-    /// <summary>
-    /// 指定インデックスのステップを開始する
-    ///
-    /// 全ステップを終えた場合は完了処理へ移行する
-    /// </summary>
-    private void AdvanceToStep(int index)
-    {
-        // 全ステップ消化したらチュートリアル完了へ
-        if (index >= steps.Count)
+        for (int i = 0; i < steps.Count; i++)
         {
-            StartCoroutine(CompleteTutorial());
-            return;
+            TutorialStep step = steps[i];
+            int index = i; // ラムダに渡すためのローカルコピー（クロージャ対策）
+
+            Button btn = Instantiate(stepButtonPrefab, buttonContainer);
+
+            TMP_Text label = btn.GetComponentInChildren<TMP_Text>();
+            if (label != null)
+                label.text = string.IsNullOrEmpty(step.stepName) ? $"ステップ {index + 1}" : step.stepName;
+
+            btn.onClick.AddListener(() => StartStep(index));
         }
+    }
+
+    // ─────────────────────────────────────────
+    // ステップ開始（選択ボタンから呼ばれる）
+    // ─────────────────────────────────────────
+
+    /// <summary>
+    /// 指定したステップを単体で開始する
+    /// 選択ボタンの onClick から呼び出される想定
+    /// </summary>
+    public void StartStep(int index)
+    {
+        // 既に別のステップ実行中なら無視（多重開始防止）
+        if (_mode == TutorialMode.Playing) return;
+        if (index < 0 || index >= steps.Count) return;
+
+
+        StartCoroutine(StartStepCoroutine(index));
+
+        SwitchDepthOfField(false);
+    }
+
+    private IEnumerator StartStepCoroutine(int index)
+    {
+        _mode = TutorialMode.Playing;
+
+        // 選択画面を隠し、プレイヤー追従カメラ側へブレンドさせる
+        if (selectionUIRoot != null) selectionUIRoot.SetActive(false);
+        ActivateStepCamera();
+
+        TutorialStep step = steps[index];
+
+        // プレイヤーをこのステップの固定位置へ出現させる
+        TeleportPlayer(step.playerSpawnPosition, step.playerSpawnRotation);
+        ShowPlayer();
+
+        // 画面遷移直後にいきなり判定が始まらないよう少し待つ
+        yield return new WaitForSeconds(stepStartDelay);
 
         _currentStepIndex = index;
         _stepClearing = false;
         _runAccumulatedTime = 0f;
+        _actionCount = 0;
 
-        TutorialStep step = steps[index];
+        // 実行中UIを表示
+        if (uiRoot != null) uiRoot.SetActive(true);
 
-        // 進行度テキストを現在のインデックスに合わせて更新
-        UpdateStepCountText();
-
-        // ステップの説明文をUIへ反映
+        // ステップ名・説明文をUIへ反映
+        if (stepTitleText != null) stepTitleText.text = step.stepName;
         ShowMessage(step.message);
 
-        // Run 条件のときだけゲージを表示し、それ以外は非表示にする
-        bool isRunStep = step.clearCondition == TutorialStep.ClearCondition.Run;
-        if (gaugeRoot != null) gaugeRoot.SetActive(isRunStep);
+        // Run / Jump / Spin / SpinHitEnemy は進捗が数値化できるためゲージを表示する
+        // それ以外の条件（ReachGoalZone・ManualClear・AutoClear）では非表示
+        bool showGauge =
+            step.clearCondition == TutorialStep.ClearCondition.Run ||
+            step.clearCondition == TutorialStep.ClearCondition.Jump ||
+            step.clearCondition == TutorialStep.ClearCondition.Spin ||
+            step.clearCondition == TutorialStep.ClearCondition.SpinHitEnemy;
+        if (gaugeRoot != null) gaugeRoot.SetActive(showGauge);
         if (gaugeSlider != null) gaugeSlider.value = 0f;
 
         // このステップに紐づくオブジェクトをシーンへ出現させる
@@ -217,21 +313,41 @@ public class TutorialManager : MonoBehaviour
     /// <summary>プレイヤーがジャンプしたときに呼ぶ（PlayerController から）</summary>
     public void NotifyJump()
     {
-        if (CurrentStep?.clearCondition == TutorialStep.ClearCondition.Jump)
-            TryClearStep();
+        TryIncrementCount(TutorialStep.ClearCondition.Jump);
     }
 
     /// <summary>プレイヤーがスピンしたときに呼ぶ（PlayerSpin から）</summary>
     public void NotifySpin()
     {
-        if (CurrentStep?.clearCondition == TutorialStep.ClearCondition.Spin)
-            TryClearStep();
+        TryIncrementCount(TutorialStep.ClearCondition.Spin);
     }
 
     /// <summary>スピンで敵を倒したときに呼ぶ（EnemyBase から）</summary>
     public void NotifySpinHitEnemy()
     {
-        if (CurrentStep?.clearCondition == TutorialStep.ClearCondition.SpinHitEnemy)
+        TryIncrementCount(TutorialStep.ClearCondition.SpinHitEnemy);
+    }
+
+    /// <summary>
+    /// Jump / Spin / SpinHitEnemy 共通の回数カウント処理
+    /// 現在のステップの条件と一致する場合のみカウントし、
+    /// requiredCount に達したらステップをクリアする
+    /// </summary>
+    private void TryIncrementCount(TutorialStep.ClearCondition condition)
+    {
+        if (CurrentStep?.clearCondition != condition) return;
+
+        // クリア演出が始まっていればカウントを止める
+        if (_stepClearing) return;
+
+        _actionCount++;
+
+        int required = Mathf.Max(1, CurrentStep.requiredCount);
+        float ratio = Mathf.Clamp01((float)_actionCount / required);
+        if (gaugeSlider != null)
+            gaugeSlider.value = ratio;
+
+        if (_actionCount >= required)
             TryClearStep();
     }
 
@@ -304,7 +420,9 @@ public class TutorialManager : MonoBehaviour
     /// ステップ完了処理のコルーチン
     ///
     /// イベント発火 → GoalZone 非表示 → スポーンオブジェクト消去 →
-    /// 完了メッセージ表示 → 次ステップへ進む
+    /// 完了表示の間 → 選択リストへ戻る
+    /// クリア済みの記録（スタンプ等）は一切残さないため、
+    /// 何度でも同じステップを選び直して確認できる
     /// </summary>
     private IEnumerator CompleteStepCoroutine()
     {
@@ -327,24 +445,108 @@ public class TutorialManager : MonoBehaviour
         if (step.despawnOnComplete)
             DespawnStepObjects();
 
-        //ShowMessage($"{step.stepName}");
+        // クリアしたことが分かるようメッセージを切り替えてから待機する
+        // （即座に選択画面へ戻ると分かりづらいため、必ずこの間を置く）
+        ShowMessage(string.IsNullOrEmpty(step.clearMessage) ? step.message : step.clearMessage);
+
         yield return new WaitForSeconds(stepCompleteDelay);
 
-        AdvanceToStep(_currentStepIndex + 1);
+        ReturnToSelection();
     }
 
     /// <summary>
-    /// 全ステップ完了後の処理
-    /// 完了メッセージを一定時間表示してから UI を非表示にする
+    /// 選択リスト画面へ戻る
+    /// プレイヤーを非表示にし、カメラを選択画面用の固定カメラへ戻す
     /// </summary>
-    private IEnumerator CompleteTutorial()
+    private void ReturnToSelection()
     {
-        _isRunning = false;
-        ShowMessage(completeMessage);
-        Debug.Log("チュートリアル完了！");
+        _mode = TutorialMode.Selecting;
+        _currentStepIndex = -1;
 
-        yield return new WaitForSeconds(hideUIDelay);
         if (uiRoot != null) uiRoot.SetActive(false);
+        if (gaugeRoot != null) gaugeRoot.SetActive(false);
+        ShowMessage("");
+
+        HidePlayer();
+        ActivateSelectionCamera();
+
+        if (selectionUIRoot != null) selectionUIRoot.SetActive(true);
+
+        SwitchDepthOfField(true);
+    }
+
+    // ─────────────────────────────────────────
+    // プレイヤーの出現・非表示
+    // ─────────────────────────────────────────
+
+    /// <summary>
+    /// プレイヤーを指定座標・回転へ強制的に移動させる
+    /// Rigidbody がある場合は速度もリセットし、
+    /// GravityBody があれば重力姿勢を強制同期する（ワープ時と同じ処理）
+    /// </summary>
+    private void TeleportPlayer(Vector3 position, Vector3 rotationEuler)
+    {
+        if (player == null) return;
+
+        Quaternion rotation = Quaternion.Euler(rotationEuler);
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+
+        if (rb != null)
+        {
+            rb.position = position;
+            rb.rotation = rotation;
+            // Unity 6 以降は linearVelocity。旧バージョンでは velocity に読み替えてください。
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+        else
+        {
+            player.transform.SetPositionAndRotation(position, rotation);
+        }
+
+        // 惑星重力システムとの姿勢ズレを防ぐため、ワープ時と同じく強制同期する
+        GravityBody gravityBody = player.GetComponent<GravityBody>();
+        if (gravityBody != null)
+            gravityBody.ForceSyncGravity();
+    }
+
+    /// <summary>プレイヤーを表示状態にする</summary>
+    private void ShowPlayer()
+    {
+        if (player != null) player.SetActive(true);
+    }
+
+    /// <summary>
+    /// プレイヤーを非表示にする（破棄はしない方針）
+    /// 選択画面に戻るたびに呼ばれる
+    /// </summary>
+    private void HidePlayer()
+    {
+        if (player != null) player.SetActive(false);
+    }
+
+    // ─────────────────────────────────────────
+    // カメラ（選択画面用固定カメラ ⇔ プレイヤー追従カメラ）
+    // ─────────────────────────────────────────
+
+    /// <summary>
+    /// 選択画面用の固定カメラの優先度を上げて、
+    /// Cinemachine Brain に選択画面カメラへブレンドさせる
+    /// </summary>
+    private void ActivateSelectionCamera()
+    {
+        if (selectionCamera != null)
+            selectionCamera.Priority = selectionCameraActivePriority;
+    }
+
+    /// <summary>
+    /// 選択画面用の固定カメラの優先度を下げて、
+    /// 既存のプレイヤー追従カメラ側へブレンドさせる
+    /// </summary>
+    private void ActivateStepCamera()
+    {
+        if (selectionCamera != null)
+            selectionCamera.Priority = selectionCameraInactivePriority;
     }
 
     // ─────────────────────────────────────────
@@ -416,7 +618,7 @@ public class TutorialManager : MonoBehaviour
     }
 
     // ─────────────────────────────────────────
-    // UI
+    // UI（メッセージ）
     // ─────────────────────────────────────────
 
     /// <summary>
@@ -426,19 +628,6 @@ public class TutorialManager : MonoBehaviour
     {
         if (messageText != null)
             messageText.text = msg;
-    }
-
-    // ─────────────────────────────────────────
-    // 進行度テキスト
-    // ─────────────────────────────────────────
-
-    /// <summary>
-    /// 現在のステップ番号をカウントテキストへ反映する（例：2/10）
-    /// </summary>
-    private void UpdateStepCountText()
-    {
-        if (stepCountText == null) return;
-        stepCountText.text = $"({_currentStepIndex + 1}/{steps.Count})";
     }
 
     // ─────────────────────────────────────────
@@ -453,5 +642,19 @@ public class TutorialManager : MonoBehaviour
     {
         yield return new WaitForSeconds(step.autoClearDelay);
         TryClearStep();
+    }
+
+    public void SwitchDepthOfField(bool _switch)
+    {
+        Debug.Log($"SwitchDepthOfField: {_switch}");
+
+        if (_switch)
+        {
+            depthOfField.active = true;
+        }
+        else
+        {
+            depthOfField.active = false;
+        }
     }
 }

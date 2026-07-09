@@ -69,9 +69,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attractForce: 20
   maxAttractSpeed: 15
-  arrivalDistance: 1.5
+  arrivalDistance: 2
   groundedLockDuration: 2
   targetPlanet: {fileID: 0}
+  nextZone: {fileID: 0}
   gizmoColor: {r: 0.4, g: 0.8, b: 1, a: 0.2}
 --- !u!1001 &4916628571433757458
 PrefabInstance:

@@ -141,12 +141,15 @@ public class PlayerHealth : MonoBehaviour
         if (ctrl != null)
             ctrl.enabled = false;
 
-        // TODO:
-        // ・死亡アニメーション
-        // ・ゲームオーバーUI
-        // ・シーンリロード
-        // ・リスポーン処理
-        // などをここへ追加
+        if (ScreenFader.Instance != null)
+        {
+            // 丸く閉じる → 閉じきったらシーンリロード
+            ScreenFader.Instance.FadeOut(ReloadScene);
+        }
+        else
+        {
+            ReloadScene();
+        }
 
         Debug.Log("[PlayerHealth] プレイヤーが死亡しました");
     }
@@ -202,5 +205,11 @@ public class PlayerHealth : MonoBehaviour
             hpText.text =
                 $"LIFE: {CurrentHp} / {maxHp}";
         }
+    }
+
+    private void ReloadScene()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
     }
 }

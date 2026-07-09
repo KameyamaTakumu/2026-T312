@@ -59,7 +59,9 @@ public enum BGM
 
     Planet1,
     Planet2,
-    Planet3
+    Planet3,
+    Tutorial,
+    Title
 }
 
 #endregion
@@ -74,6 +76,8 @@ public enum BGM
 public enum SE
 {
     None = -1,
+    Jump,
+    CoinGet,
 }
 
 #endregion

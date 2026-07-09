@@ -140,6 +140,19 @@ public class PlayerController : MonoBehaviour
         InitCamForward();
     }
 
+    void Start()
+    {
+        if (RespawnManager.Instance != null && RespawnManager.Instance.HasRespawnPoint)
+        {
+            var rb = GetComponent<Rigidbody>();
+            rb.position = RespawnManager.Instance.RespawnPosition;
+            rb.rotation = RespawnManager.Instance.RespawnRotation;
+
+            // 重力方向のズレ解消（ワープ時と同じ対処）
+            GetComponent<GravityBody>()?.ForceSyncGravity();
+        }
+    }
+
     /// <summary>
     /// _camForward の初期化・立て直し
     /// 惑星上方向に対して垂直な単位ベクトルを保証する
@@ -402,11 +415,9 @@ public class PlayerController : MonoBehaviour
 
         if (isGrounded)
         {
-            //rb.AddForce(
-            //    transform.up * jumpForce,
-            //    ForceMode.Impulse
-            //);
             rb.AddForce((rb.rotation * Vector3.up) * jumpForce, ForceMode.Impulse);
+
+            SE.Jump.Play();
 
             // チュートリアルへ通知
             TutorialManager.Instance?.NotifyJump();

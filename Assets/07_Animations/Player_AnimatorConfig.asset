@@ -69,11 +69,11 @@ MonoBehaviour:
         Mode: 1
         Threshold: 0
     - FromAnyState: 0
-      CanTransitionToSelf: 0
+      CanTransitionToSelf: 1
       ToState: Ground
-      HasExitTime: 1
-      ExitTime: 0.9
-      Duration: 0.1
+      HasExitTime: 0
+      ExitTime: 1
+      Duration: 0
       Conditions:
       - Parameter: SpinTrigger
         Mode: 1
