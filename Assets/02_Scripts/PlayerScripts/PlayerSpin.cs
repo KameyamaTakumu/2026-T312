@@ -186,6 +186,8 @@ public class PlayerSpin : MonoBehaviour
 
         // スピン開始と同時に攻撃判定を行う
         PerformSpinAttack();
+
+        SE.Spin.Play();
     }
 
     /// <summary>

@@ -82,6 +82,9 @@ public class BossEnemyChaser : EnemyBase
     [CustomLabel("プレイヤーのTransform（未設定なら自動検索）"), SerializeField]
     private Transform playerTransform;
 
+    [SerializeField]
+    private SceneObject gameClearScene;
+
     // ─────────────────────────────────────────
     // 内部状態
     // ─────────────────────────────────────────
@@ -364,7 +367,29 @@ public class BossEnemyChaser : EnemyBase
             // 岩に激突 → ダメージ
             TakeDamage(1);
 
+            SE.Damage_Enemy.Play();
+
             EnterRecovering(rockHitStunDuration);
         }
+    }
+
+    protected override void OnDeath()
+    {
+        SE.EnemyDie.Play();
+
+        if (ScreenFader.Instance != null)
+        {
+            // 丸く閉じる → 閉じきったらシーンリロード
+            ScreenFader.Instance.FadeOut(SceneChange);
+        }
+        else
+        {
+            SceneChange();
+        }
+    }
+
+    private void SceneChange()
+    {
+        gameClearScene.Load();
     }
 }

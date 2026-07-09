@@ -85,6 +85,8 @@ public class PlayerHealth : MonoBehaviour
         // 0ñ¢ñûÇ…Ç»ÇÁÇ»Ç¢ÇÊÇ§êßå¿
         CurrentHp = Mathf.Max(CurrentHp, 0);
 
+        SE.Damage_Player.Play();
+
         // UIçXêV
         UpdateUI();
 

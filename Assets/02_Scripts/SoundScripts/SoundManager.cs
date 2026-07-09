@@ -76,8 +76,16 @@ public enum BGM
 public enum SE
 {
     None = -1,
+
     Jump,
     CoinGet,
+    Spin,
+    Damage_Player,
+    Damage_Enemy,
+    EnemyDie,
+    Button,
+    Warp,
+    Fade
 }
 
 #endregion

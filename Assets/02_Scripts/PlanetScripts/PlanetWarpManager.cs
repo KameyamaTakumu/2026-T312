@@ -79,6 +79,8 @@ public class PlanetWarpManager : MonoBehaviour
                 arcHeight
             )
         );
+
+        SE.Warp.Play();
     }
 
     /// <summary>

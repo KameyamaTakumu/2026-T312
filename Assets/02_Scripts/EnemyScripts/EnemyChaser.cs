@@ -280,11 +280,15 @@ public class EnemyChaser : EnemyBase
             ).normalized;
 
         rb.linearVelocity += knockDir * 4f;
+
+        SE.Damage_Enemy.Play();
     }
 
     protected override void OnDeath()
     {
         TutorialManager.Instance?.NotifySpinHitEnemy();
+
+        SE.EnemyDie.Play();
     }
 
 #if UNITY_EDITOR

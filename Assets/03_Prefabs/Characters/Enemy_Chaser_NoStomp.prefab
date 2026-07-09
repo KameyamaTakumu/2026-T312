@@ -322,6 +322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityJumpForce: 12
+  controlsBGM: 0
 --- !u!114 &4945448470835774017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,7 +365,7 @@ Animator:
   m_GameObject: {fileID: 2283587718313846152}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 75276a71192e21f4b9b0b1f60158482b, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 916543b00372c8b46a78d0ffdb4e4e34, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

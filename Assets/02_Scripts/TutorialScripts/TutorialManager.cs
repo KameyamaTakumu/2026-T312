@@ -58,10 +58,15 @@ public class TutorialManager : MonoBehaviour
     [CustomLabel("プレイヤーオブジェクト"), SerializeField]
     private GameObject player;
 
+    private Vector3 playerTransform = new Vector3(0, 38, 0);
+
     [Header("カメラ設定（Cinemachine）")]
     // 選択画面表示中に使う固定カメラ（初期位置に据え置くカメラ）
     [CustomLabel("選択画面用の固定カメラ"), SerializeField]
     private CinemachineCamera selectionCamera;
+
+    // カメラ位置保存変数
+    private Vector3 initialCameraPosition;
 
     // 選択画面表示中の優先度（プレイヤー追従カメラより高い値にする）
     [CustomLabel("選択画面カメラ：表示中の優先度"), SerializeField]
@@ -197,6 +202,8 @@ public class TutorialManager : MonoBehaviour
 
         // カメラは選択画面用の固定カメラに合わせておく
         ActivateSelectionCamera();
+
+        initialCameraPosition = selectionCamera.transform.position;
 
         // ステップ数分の選択ボタンを生成して選択画面を表示する
         BuildSelectionButtons();
@@ -470,6 +477,8 @@ public class TutorialManager : MonoBehaviour
         HidePlayer();
         ActivateSelectionCamera();
 
+        selectionCamera.transform.position = initialCameraPosition;
+
         if (selectionUIRoot != null) selectionUIRoot.SetActive(true);
 
         SwitchDepthOfField(true);
@@ -514,6 +523,9 @@ public class TutorialManager : MonoBehaviour
     private void ShowPlayer()
     {
         if (player != null) player.SetActive(true);
+
+        // プレイヤーの位置を設定した位置へ変更
+        TeleportPlayer(playerTransform, Vector3.zero);
     }
 
     /// <summary>

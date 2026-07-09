@@ -82,6 +82,8 @@ public class ScreenFader : MonoBehaviour
     /// </summary>
     public Tween FadeOut(System.Action onComplete = null)
     {
+        SE.Fade.Play();
+
         return DOTween.To(() => _material.GetFloat(RadiusID), SetRadius, 0f, fadeDuration)
             .SetEase(Ease.InOutQuad)
             .OnComplete(() => onComplete?.Invoke());
@@ -93,6 +95,9 @@ public class ScreenFader : MonoBehaviour
     public Tween FadeIn(System.Action onComplete = null)
     {
         SetRadius(0f);
+
+        SE.Fade.Play();
+
         return DOTween.To(() => _material.GetFloat(RadiusID), SetRadius, openRadius, fadeDuration)
             .SetEase(Ease.InOutQuad)
             .OnComplete(() => onComplete?.Invoke());

@@ -245,6 +245,12 @@ public class PlayerController : MonoBehaviour
         // A(-1) / D(+1)
         float turn = Input.GetAxisRaw("Horizontal");
 
+        if (GameSettingsManager.Instance != null &&
+            GameSettingsManager.Instance.InvertCamera)
+        {
+            turn *= -1f;
+        }
+
         if (Mathf.Approximately(turn, 0f))
             return;
 

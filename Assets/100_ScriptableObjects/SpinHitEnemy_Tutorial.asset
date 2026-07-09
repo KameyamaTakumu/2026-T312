@@ -19,11 +19,17 @@ MonoBehaviour:
   clearCondition: 3
   autoClearDelay: 2
   runRequiredTime: 3
-  requiredCount: 1
+  requiredCount: 3
   clearMessage: "\u30AF\u30EA\u30A2\uFF01"
   spawnObjects:
   - prefab: {fileID: 3606662782293865053, guid: 9cab222c6a99f334ba85b329de0c0c1a, type: 3}
+    position: {x: 15, y: 37.5, z: 10}
+    rotation: {x: 0, y: 0, z: 0}
+  - prefab: {fileID: 3606662782293865053, guid: 9cab222c6a99f334ba85b329de0c0c1a, type: 3}
     position: {x: 0, y: 37.5, z: 10}
+    rotation: {x: 0, y: 0, z: 0}
+  - prefab: {fileID: 3606662782293865053, guid: 9cab222c6a99f334ba85b329de0c0c1a, type: 3}
+    position: {x: -15, y: 37.5, z: 10}
     rotation: {x: 0, y: 0, z: 0}
   despawnOnComplete: 1
   goalZoneObjectName: 

@@ -743,6 +743,8 @@ MonoBehaviour:
   rockHitStunDuration: 1.5
   rockTag: Rock
   playerTransform: {fileID: 0}
+  gameClearScene:
+    m_SceneName: 03_GameClearScene
 --- !u!95 &-1685814123274313156
 Animator:
   serializedVersion: 7
@@ -753,7 +755,7 @@ Animator:
   m_GameObject: {fileID: 3519125177220622748}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 3d532271a1f4655488cd0768acd23525, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1d26431c18c54524aaa8ba0748c35e53, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

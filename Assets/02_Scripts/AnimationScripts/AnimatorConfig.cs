@@ -77,7 +77,9 @@ public class AnimatorConfig : ScriptableObject
     public AnimatorController BuildControllerEditor(GameObject owner)
     {
         // 新規AnimatorController生成
-        var ctrl = new AnimatorController();
+        var ctrl =
+    AnimatorController.CreateAnimatorControllerAtPath(
+        "Assets/CharacterAnimator_Generated.controller");
 
         ctrl.name = "CharacterAnimator_Generated";
 

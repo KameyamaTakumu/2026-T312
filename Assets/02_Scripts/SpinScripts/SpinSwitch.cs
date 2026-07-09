@@ -31,6 +31,10 @@ public class SpinSwitch : MonoBehaviour
     [CustomLabel("起動済みか"), SerializeField]
     private bool isActivated = false;
 
+    // 起動したときに変化するマテリアル
+    [CustomLabel("起動済みマテリアル"), SerializeField]
+    private Material OnMaterial;
+
     [Header("イベント")]
 
     // スイッチ起動時に呼ばれるイベント
@@ -132,6 +136,8 @@ public class SpinSwitch : MonoBehaviour
         onActivated?.Invoke();
 
         Debug.Log($"{switchId}が起動しました");
+
+        render.material = OnMaterial;
 
         // Group に通知
         // Group 側で全スイッチ起動を判定する
