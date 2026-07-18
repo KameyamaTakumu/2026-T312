@@ -124,7 +124,7 @@ public class PlayerSpin : MonoBehaviour
         //
         // GetButtonDown ‚Í1ƒtƒŒ[ƒ€‚Ì‚İ true ‚É‚È‚é‚½‚ßA
         // •¨—ˆ—‚Å‚Í‚È‚­ Update ‚Åæ“¾‚·‚é
-        if(Input.GetKeyDown(KeyCode.LeftShift)
+        if((Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
             && !isSpinning
             && !onCooldown)
         {

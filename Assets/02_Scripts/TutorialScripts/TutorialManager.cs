@@ -115,6 +115,13 @@ public class TutorialManager : MonoBehaviour
 
     private DepthOfField depthOfField;
 
+    [Header("ゲームプレイUI（コイン・ライフ）")]
+    [CustomLabel("コインキャンバス"), SerializeField]
+    private GameObject coinCanvasRoot;
+
+    [CustomLabel("ライフキャンバス"), SerializeField]
+    private GameObject lifeCanvasRoot;
+
     // ─────────────────────────────────────────
     // 内部状態
     // ─────────────────────────────────────────
@@ -289,13 +296,19 @@ public class TutorialManager : MonoBehaviour
         if (stepTitleText != null) stepTitleText.text = step.stepName;
         ShowMessage(step.message);
 
+        // ★追加：ステップ内容に応じてゲームプレイUIを表示
+        UpdateGameplayCanvases(step);
+
         // Run / Jump / Spin / SpinHitEnemy は進捗が数値化できるためゲージを表示する
         // それ以外の条件（ReachGoalZone・ManualClear・AutoClear）では非表示
         bool showGauge =
-            step.clearCondition == TutorialStep.ClearCondition.Run ||
-            step.clearCondition == TutorialStep.ClearCondition.Jump ||
-            step.clearCondition == TutorialStep.ClearCondition.Spin ||
-            step.clearCondition == TutorialStep.ClearCondition.SpinHitEnemy;
+    step.clearCondition == TutorialStep.ClearCondition.Run ||
+    step.clearCondition == TutorialStep.ClearCondition.Jump ||
+    step.clearCondition == TutorialStep.ClearCondition.Spin ||
+    step.clearCondition == TutorialStep.ClearCondition.SpinHitEnemy ||
+    step.clearCondition == TutorialStep.ClearCondition.CollectCoin ||
+    step.clearCondition == TutorialStep.ClearCondition.CoinHitEnemy ||
+    step.clearCondition == TutorialStep.ClearCondition.ActivateSpinSwitch;
         if (gaugeRoot != null) gaugeRoot.SetActive(showGauge);
         if (gaugeSlider != null) gaugeSlider.value = 0f;
 
@@ -472,6 +485,11 @@ public class TutorialManager : MonoBehaviour
 
         if (uiRoot != null) uiRoot.SetActive(false);
         if (gaugeRoot != null) gaugeRoot.SetActive(false);
+
+        // ★追加
+        if (coinCanvasRoot != null) coinCanvasRoot.SetActive(false);
+        if (lifeCanvasRoot != null) lifeCanvasRoot.SetActive(false);
+
         ShowMessage("");
 
         HidePlayer();
@@ -640,6 +658,67 @@ public class TutorialManager : MonoBehaviour
     {
         if (messageText != null)
             messageText.text = msg;
+    }
+
+    /// <summary>
+    /// ステップのクリア条件に応じて、コインキャンバス・ライフキャンバスの
+    /// 表示/非表示を切り替える。
+    /// コインが絡む条件では coinCanvasRoot、
+    /// 敵が絡む条件では lifeCanvasRoot を表示する（両方絡む場合は両方表示）
+    /// </summary>
+    private void UpdateGameplayCanvases(TutorialStep step)
+    {
+        bool showCoin = false;
+        bool showLife = false;
+
+        switch (step.clearCondition)
+        {
+            case TutorialStep.ClearCondition.CollectCoin:
+                showCoin = true;
+                break;
+
+            case TutorialStep.ClearCondition.CoinHitEnemy:
+                showCoin = true;
+                showLife = true;
+                break;
+
+            case TutorialStep.ClearCondition.SpinHitEnemy:
+                showLife = true;
+                break;
+
+                // Run / Jump / Spin / ActivateSpinSwitch / ReachGoalZone /
+                // ManualClear / AutoClear はコイン・敵のいずれにも関係しないため
+                // 両方非表示のまま
+        }
+
+        if (coinCanvasRoot != null) coinCanvasRoot.SetActive(showCoin);
+        if (lifeCanvasRoot != null) lifeCanvasRoot.SetActive(showLife);
+    }
+
+    /// <summary>コインを取得したときに呼ぶ（Coin から）</summary>
+    public void NotifyCoinCollected()
+    {
+        TryIncrementCount(TutorialStep.ClearCondition.CollectCoin);
+    }
+
+    /// <summary>コインを投げて敵を倒したときに呼ぶ（LaunchedCoin から）</summary>
+    public void NotifyCoinHitEnemy()
+    {
+        TryIncrementCount(TutorialStep.ClearCondition.CoinHitEnemy);
+    }
+
+    /// <summary>
+    /// スピンスイッチが起動したときに呼ぶ（SpinSwitch から）
+    /// targetSwitchId が指定されていれば一致するスイッチのみ受理する
+    /// </summary>
+    public void NotifySpinSwitchActivated(string switchId)
+    {
+        if (CurrentStep?.clearCondition != TutorialStep.ClearCondition.ActivateSpinSwitch) return;
+
+        if (!string.IsNullOrEmpty(CurrentStep.targetSwitchId) &&
+            CurrentStep.targetSwitchId != switchId) return;
+
+        TryIncrementCount(TutorialStep.ClearCondition.ActivateSpinSwitch);
     }
 
     // ─────────────────────────────────────────

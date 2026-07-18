@@ -247,7 +247,7 @@ public abstract class EnemyBase : MonoBehaviour
     /// <summary>
     /// 汎用ダメージ処理
     /// </summary>
-    public void TakeDamage(int amount)
+    public virtual void TakeDamage(int amount)
     {
         // 無敵中・死亡中は無効
         if (isDead || invincible)

@@ -143,6 +143,9 @@ public class SpinSwitch : MonoBehaviour
         // Group 側で全スイッチ起動を判定する
         if (spinSwitchGroup != null)
             spinSwitchGroup.NotifyActivated(this);
+
+        // ★追加
+        TutorialManager.Instance?.NotifySpinSwitchActivated(switchId);
     }
 
     /// <summary>

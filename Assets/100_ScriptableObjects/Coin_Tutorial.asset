@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 669d6f1b1910ad04783c47bac8e2caa6, type: 3}
+  m_Name: Coin_Tutorial
+  m_EditorClassIdentifier: 
+  stepName: "\u30B3\u30A4\u30F3\u53D6\u5F97\u65B9\u6CD5"
+  message: "\u30B3\u30A4\u30F3\u3092\u53D6\u5F97\u3059\u308B\u306B\u306F\uFF3B\u89E6\u308C\u308B\uFF3D\u304B\n\uFF3B\u30DE\u30A6\u30B9\u30DD\u30A4\u30F3\u30BF\u30FC\u3092\u5408\u308F\u305B\u308B\uFF3D\u3068\u53D6\u5F97\uFF01\n\u30B3\u30A4\u30F3\u3092\u6575\u306B\u3076\u3064\u3051\u308B\u3068\u5012\u305B\u308B\u305E\uFF01"
+  playerSpawnPosition: {x: 0, y: 0, z: 0}
+  playerSpawnRotation: {x: 0, y: 0, z: 0}
+  targetSwitchId: 
+  clearCondition: 7
+  autoClearDelay: 2
+  runRequiredTime: 3
+  requiredCount: 3
+  clearMessage: "\u30AF\u30EA\u30A2\uFF01"
+  spawnObjects:
+  - prefab: {fileID: 1282157366893234392, guid: 32b7f51181f572f48a153d8d00c15d12, type: 3}
+    position: {x: 0, y: 25, z: 30}
+    rotation: {x: 0, y: 0, z: 0}
+  - prefab: {fileID: 1282157366893234392, guid: 32b7f51181f572f48a153d8d00c15d12, type: 3}
+    position: {x: -15, y: 25, z: 30}
+    rotation: {x: 0, y: 0, z: 0}
+  - prefab: {fileID: 1282157366893234392, guid: 32b7f51181f572f48a153d8d00c15d12, type: 3}
+    position: {x: 15, y: 25, z: 30}
+    rotation: {x: 0, y: 0, z: 0}
+  - prefab: {fileID: 1282157366893234392, guid: 32b7f51181f572f48a153d8d00c15d12, type: 3}
+    position: {x: -30, y: 25, z: 30}
+    rotation: {x: 0, y: 0, z: 0}
+  - prefab: {fileID: 1282157366893234392, guid: 32b7f51181f572f48a153d8d00c15d12, type: 3}
+    position: {x: 30, y: 25, z: 30}
+    rotation: {x: 0, y: 0, z: 0}
+  despawnOnComplete: 1
+  goalZoneObjectName: 

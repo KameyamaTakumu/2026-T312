@@ -618,7 +618,7 @@ GameObject:
   - component: {fileID: -6358489548700591198}
   m_Layer: 0
   m_Name: BossEnemy_Chaser
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -717,8 +717,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 3
-  vulnerableToCoin: 1
-  vulnerableToStomp: 1
+  vulnerableToCoin: 0
+  vulnerableToStomp: 0
   stompBounceForce: 10
   damagesPlayerOnContact: 1
   damagesPlayerOnStomp: 0

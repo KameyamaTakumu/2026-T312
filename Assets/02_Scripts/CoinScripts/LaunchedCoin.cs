@@ -199,7 +199,13 @@ public class LaunchedCoin : MonoBehaviour
         EnemyBase enemyBase = enemy.GetComponent<EnemyBase>()
                            ?? enemy.GetComponentInParent<EnemyBase>();
         if (enemyBase != null)
+        {
             enemyBase.TakeDamageFromCoin(1);
+
+            //// ★追加：コインのダメージで実際に倒した場合のみチュートリアル通知
+            //if (enemyBase.IsDead)
+            //    TutorialManager.Instance?.NotifyCoinHitEnemy();
+        }
         else
             Debug.Log($"[LaunchedCoin] 敵に命中（EnemyBase なし）: {enemy.name}");
     }

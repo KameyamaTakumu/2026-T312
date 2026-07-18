@@ -236,7 +236,7 @@ GameObject:
   - component: {fileID: 1376197520603376531}
   m_Layer: 0
   m_Name: Enemy_Chaser_NoStomp
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -335,7 +335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fcde87b4c8356c46b416592ca9933e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 2
+  maxHp: 1
   vulnerableToCoin: 1
   vulnerableToStomp: 0
   stompBounceForce: 10

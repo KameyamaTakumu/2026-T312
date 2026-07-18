@@ -58,6 +58,12 @@ public class GravityBody : MonoBehaviour
     public bool IsBeingAttracted => _isBeingAttracted;
 
     /// <summary>
+    /// 現在プレイヤーが重力を受けている惑星。
+    /// 惑星ごとにカメラ角度などを変えたい場合、PlayerController側から参照する。
+    /// </summary>
+    public GravityAttractor CurrentAttractor => _currentAttractor;
+
+    /// <summary>
     /// PlayerController が毎 FixedUpdate で設定する接地フラグ。
     /// 接地中はゾーン侵入登録を無視して、歩行中に意図せず
     /// ジャンプが発動するのを防ぐ。

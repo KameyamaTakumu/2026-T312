@@ -65,14 +65,22 @@ public class TutorialStep : ScriptableObject
     [Tooltip("クリア条件")]
     public enum ClearCondition
     {
-        Run,            // 指定時間走り続ける
-        Jump,           // ジャンプする
-        Spin,           // スピンする
-        SpinHitEnemy,   // スピンで敵を倒す
-        ReachGoalZone,  // 指定 GoalZone に到達する
-        ManualClear,    // 外部スクリプトから手動クリア
-        AutoClear,      // 一定時間後に自動クリア
+        Run,                 // 指定時間走り続ける
+        Jump,                // ジャンプする
+        Spin,                // スピンする
+        SpinHitEnemy,        // スピンで敵を倒す
+        ReachGoalZone,       // 指定 GoalZone に到達する
+        ManualClear,         // 外部スクリプトから手動クリア
+        AutoClear,           // 一定時間後に自動クリア
+        CollectCoin,         // コインを取得する
+        CoinHitEnemy,        // コインを投げて敵を倒す
+        ActivateSpinSwitch,  // スピンスイッチを起動する
     }
+
+    // SpinSwitch 用（ReachGoalZone の goalZoneObjectName と同じ考え方）
+    // 空文字なら「どのスイッチでもOK」として扱う
+    [CustomLabel("対象スイッチID（ActivateSpinSwitch時のみ、空=どれでも可）"), SerializeField]
+    public string targetSwitchId = "";
 
     // このステップで使用するクリア条件
     [CustomLabel("クリア条件")]
