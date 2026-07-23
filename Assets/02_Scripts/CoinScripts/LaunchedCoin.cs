@@ -202,7 +202,7 @@ public class LaunchedCoin : MonoBehaviour
         {
             enemyBase.TakeDamageFromCoin(1);
 
-            //// ★追加：コインのダメージで実際に倒した場合のみチュートリアル通知
+            //// コインのダメージで実際に倒した場合のみチュートリアル通知
             //if (enemyBase.IsDead)
             //    TutorialManager.Instance?.NotifyCoinHitEnemy();
         }

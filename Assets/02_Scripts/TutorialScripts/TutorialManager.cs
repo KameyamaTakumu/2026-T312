@@ -296,7 +296,7 @@ public class TutorialManager : MonoBehaviour
         if (stepTitleText != null) stepTitleText.text = step.stepName;
         ShowMessage(step.message);
 
-        // ★追加：ステップ内容に応じてゲームプレイUIを表示
+        // ステップ内容に応じてゲームプレイUIを表示
         UpdateGameplayCanvases(step);
 
         // Run / Jump / Spin / SpinHitEnemy は進捗が数値化できるためゲージを表示する
@@ -486,7 +486,6 @@ public class TutorialManager : MonoBehaviour
         if (uiRoot != null) uiRoot.SetActive(false);
         if (gaugeRoot != null) gaugeRoot.SetActive(false);
 
-        // ★追加
         if (coinCanvasRoot != null) coinCanvasRoot.SetActive(false);
         if (lifeCanvasRoot != null) lifeCanvasRoot.SetActive(false);
 
@@ -520,9 +519,6 @@ public class TutorialManager : MonoBehaviour
 
         if (rb != null)
         {
-            rb.position = position;
-            rb.rotation = rotation;
-            // Unity 6 以降は linearVelocity。旧バージョンでは velocity に読み替えてください。
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }

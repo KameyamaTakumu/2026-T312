@@ -144,7 +144,6 @@ public class SpinSwitch : MonoBehaviour
         if (spinSwitchGroup != null)
             spinSwitchGroup.NotifyActivated(this);
 
-        // Åöí«â¡
         TutorialManager.Instance?.NotifySpinSwitchActivated(switchId);
     }
 

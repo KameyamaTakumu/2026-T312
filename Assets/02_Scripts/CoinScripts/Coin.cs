@@ -362,7 +362,7 @@ public class Coin : MonoBehaviour
         State = CoinState.Collected;
         CoinManager.Instance?.AddCoins(value);
 
-        TutorialManager.Instance?.NotifyCoinCollected();  // ★追加
+        TutorialManager.Instance?.NotifyCoinCollected();
         Destroy(gameObject);
     }
 
