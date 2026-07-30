@@ -50,6 +50,7 @@ public class GravityBody : MonoBehaviour
 
     [SerializeField] private bool controlsBGM = false; // Inspectorでプレイヤーのみtrueに
     private GravityAttractor _lastBGMAttractor; // 直前にBGMを鳴らした惑星
+    [SerializeField] private bool controlsRespawn = false;
 
     // ─────────────────────────────────────────
     // 公開プロパティ
@@ -91,14 +92,14 @@ public class GravityBody : MonoBehaviour
         if (_isBeingAttracted)
             UpdateAttractedMovement();
         else
-            UpdateNormalGravity();
+            UpdateGravity();
     }
 
     // ─────────────────────────────────────────
-    // 通常重力
+    // 重力処理
     // ─────────────────────────────────────────
 
-    private void UpdateNormalGravity()
+    private void UpdateGravity()
     {
         if (_attractors == null || _attractors.Length == 0) return;
 
@@ -146,8 +147,7 @@ public class GravityBody : MonoBehaviour
                 _lastBGMAttractor = _currentAttractor;
             }
 
-            // リスポーン地点更新（未設定ならメソッド内でreturnされ現状維持）
-            if (RespawnManager.Instance != null)
+            if (controlsRespawn && RespawnManager.Instance != null)
                 RespawnManager.Instance.SetRespawnPoint(_currentAttractor.RespawnPoint);
         }
     }
