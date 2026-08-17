@@ -63,11 +63,6 @@ public class PlayerController : MonoBehaviour
     [CustomLabel("プレイヤー回転速度"), SerializeField]
     private float rotationSpeed = 15f;
 
-    // ※現在未使用（慣性なし仕様のためLerp/Slerpを廃止）
-    // 将来的にわずかな滑らかさが欲しくなった場合のために残してあります
-    [CustomLabel("カメラ追従の滑らかさ（現在未使用）"), SerializeField]
-    private float cameraSmooth = 5f;
-
     // A/D 入力によるカメラ旋回速度（度/秒）
     [CustomLabel("カメラ左右旋回速度"), SerializeField]
     private float cameraTurnSpeed = 120f;

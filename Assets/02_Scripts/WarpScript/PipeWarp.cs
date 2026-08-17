@@ -88,6 +88,8 @@ public class PipeWarp : MonoBehaviour
         Transform exitPoint = connectedPipe.transform;
         Vector3 exitPos = exitPoint.position + exitPoint.forward * exitOffset;
 
+        SE.PipeWarp.Play();
+
         // Rigidbody.position / rotation ‚ğ’¼Ú‘‚«Š·‚¦‚é‚±‚Æ‚Å
         // •¨—‰‰Z‚ğ‰î‚³‚¸uŠÔˆÚ“®‚³‚¹‚é
         playerRb.position = exitPos;

@@ -253,10 +253,7 @@ public class PlanetWarpManager : MonoBehaviour
     /// </summary>
     private Vector3 GetPlanetCenter(Vector3 fromPosition)
     {
-        GravityAttractor[] attractors =
-            FindObjectsByType<GravityAttractor>(
-                FindObjectsSortMode.None
-            );
+        GravityAttractor[] attractors = Object.FindObjectsByType<GravityAttractor>();
 
         float minDist = float.MaxValue;
 

@@ -207,7 +207,7 @@ public class Coin : MonoBehaviour
     private void UpdatePlanetUp()
     {
         GravityAttractor[] attractors =
-            Object.FindObjectsByType<GravityAttractor>(FindObjectsSortMode.None);
+            Object.FindObjectsByType<GravityAttractor>();
 
         if (attractors == null || attractors.Length == 0)
             return;

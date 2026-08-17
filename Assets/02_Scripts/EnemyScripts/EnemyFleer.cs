@@ -367,6 +367,8 @@ public class EnemyFleer : MonoBehaviour
         if (captureGroup != null)
             captureGroup.NotifyCaught();
 
+        SE.RabitCatch.Play();
+
         // 敵オブジェクト自体を破棄
         Destroy(gameObject);
     }

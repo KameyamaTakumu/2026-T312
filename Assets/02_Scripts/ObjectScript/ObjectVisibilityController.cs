@@ -21,9 +21,6 @@ public class ObjectVisibilityController : MonoBehaviour
     [Header("惑星表示用カメラ")]
     [SerializeField] private CinemachineCamera planetCamera;
 
-    [Header("表示時にカメラを向けるか")]
-    [SerializeField] private bool lookAtWhenShown = true;
-
     [Header("カメラ自動復帰設定")]
 
     // 惑星カメラへ切り替えてから自動でカメラを戻すまでの時間（秒）

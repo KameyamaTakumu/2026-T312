@@ -28,8 +28,8 @@
  * 
  * 3. スクリプトから再生
  * 
- * SoundManager.Instance.PlayBGM(BGM.Title);
- * SoundManager.Instance.PlaySE(SE.Coin);
+ * BGM.Title.Play();
+ * SE.Coin.Play();
  * 
  * -------------------------------------------------------
  * 特徴
@@ -44,7 +44,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
 
 #region BGM Enum
 
@@ -85,7 +84,9 @@ public enum SE
     EnemyDie,
     Button,
     Warp,
-    Fade
+    Fade,
+    PipeWarp,
+    RabitCatch
 }
 
 #endregion

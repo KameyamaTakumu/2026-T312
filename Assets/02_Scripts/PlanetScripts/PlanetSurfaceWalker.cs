@@ -95,9 +95,7 @@ public class PlanetSurfaceWalker : MonoBehaviour
         // ˜f¯–¢İ’è‚È‚çÅŠñ‚è‚ğ©“®æ“¾
         if (targetPlanet == null)
         {
-            GravityAttractor[] all =
-                FindObjectsByType<GravityAttractor>(
-                    FindObjectsSortMode.None);
+            GravityAttractor[] all = Object.FindObjectsByType<GravityAttractor>();
 
             float minDist = float.MaxValue;
             foreach (var a in all)

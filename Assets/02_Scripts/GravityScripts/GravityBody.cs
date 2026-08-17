@@ -52,6 +52,9 @@ public class GravityBody : MonoBehaviour
     private GravityAttractor _lastBGMAttractor; // 直前にBGMを鳴らした惑星
     [SerializeField] private bool controlsRespawn = false;
 
+    // 到着判定（区間とゾーン球の交差判定）に使う、直前フレームの位置
+    private Vector3 _prevAttractedPos;
+
     // ─────────────────────────────────────────
     // 公開プロパティ
     // ─────────────────────────────────────────
@@ -84,7 +87,7 @@ public class GravityBody : MonoBehaviour
 
     private void Start()
     {
-        _attractors = FindObjectsByType<GravityAttractor>(FindObjectsSortMode.None);
+        _attractors = Object.FindObjectsByType<GravityAttractor>();
     }
 
     private void FixedUpdate()
@@ -165,17 +168,20 @@ public class GravityBody : MonoBehaviour
             return;
         }
 
-        Vector3 toZone = _currentZone.transform.position - _rb.position;
-        float distance = toZone.magnitude;
+        //Vector3 toZone = _currentZone.transform.position - _rb.position;
+        //float distance = toZone.magnitude;
+        Vector3 zoneCenter = _currentZone.transform.position;
+        Vector3 currentPos = _rb.position;
 
         // ── 到着判定 ──
-        if (distance <= _currentZone.ArrivalDistance)
+        if (SegmentIntersectsSphere(_prevAttractedPos, currentPos, zoneCenter, _currentZone.ArrivalDistance))
         {
             OnArrivedAtZone();
             return;
         }
 
         // ── ゾーン中心へ加速 ──
+        Vector3 toZone = zoneCenter - currentPos;
         Vector3 attractDir = toZone.normalized;
         _rb.AddForce(attractDir * _currentZone.AttractForce);
 
@@ -189,6 +195,8 @@ public class GravityBody : MonoBehaviour
             Quaternion targetRot = Quaternion.LookRotation(attractDir, transform.up);
             _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, targetRot, 5f * Time.fixedDeltaTime));
         }
+
+        _prevAttractedPos = currentPos;
     }
 
     // ─────────────────────────────────────────
@@ -207,6 +215,7 @@ public class GravityBody : MonoBehaviour
             // ── 中継ゾーン：飛行を止めずに次ゾーンへ切り替える ──
             // 速度は引き継ぎ（急ブレーキなし）次ゾーンの引力で自然に加速する
             _currentZone = next;
+            _prevAttractedPos = _rb.position;
             Debug.Log($"リレー継続 → {next.gameObject.name}");
         }
         else
@@ -291,6 +300,7 @@ public class GravityBody : MonoBehaviour
         _isBeingAttracted = true;
         Vector3 dir = (_currentZone.transform.position - _rb.position).normalized;
         _rb.linearVelocity = dir * gravityJumpForce;
+        _prevAttractedPos = _rb.position;
 
         Debug.Log($"引力ジャンプ開始：{_currentZone.gameObject.name}");
         return true;
@@ -352,7 +362,7 @@ public class GravityBody : MonoBehaviour
     public void ForceSyncGravity()
     {
         if (_attractors == null || _attractors.Length == 0)
-            _attractors = FindObjectsByType<GravityAttractor>(FindObjectsSortMode.None);
+            _attractors = Object.FindObjectsByType<GravityAttractor>();
 
         GravityAttractor nearest = GetNearestAttractor();
         if (nearest != null)
@@ -360,5 +370,23 @@ public class GravityBody : MonoBehaviour
             _currentAttractor = nearest;
             nearest.Attract(_rb);
         }
+    }
+
+    /// <summary>
+    /// 移動区間 p0→p1 が、中心 center・半径 radius の球と交差するかどうかを判定する。
+    /// 区間上でcenterに最も近づく点を内積で求め、その点との距離で判定することで、
+    /// 1フレームの移動量が大きい場合でも交差の見落としを防ぐ。
+    /// </summary>
+    private bool SegmentIntersectsSphere(Vector3 p0, Vector3 p1, Vector3 center, float radius)
+    {
+        Vector3 seg = p1 - p0;
+        float segLenSqr = seg.sqrMagnitude;
+
+        if (segLenSqr < 1e-6f)
+            return (p0 - center).sqrMagnitude <= radius * radius;
+
+        float t = Mathf.Clamp01(Vector3.Dot(center - p0, seg) / segLenSqr);
+        Vector3 closest = p0 + seg * t;
+        return (closest - center).sqrMagnitude <= radius * radius;
     }
 }
