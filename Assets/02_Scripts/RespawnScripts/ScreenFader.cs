@@ -4,10 +4,10 @@ using UnityEngine.SceneManagement;
 using DG.Tweening;
 
 /// <summary>
-/// 円形フェード(アイリスワイプ)管理
-/// 
+/// 円形フェード（アイリスワイプ）管理。
+///
 /// 死亡時に閉じる／シーンリロード後に開く演出を制御する。
-/// SoundManager 等と同じ DontDestroyOnLoad シングルトン。
+/// SoundManager等と同じDontDestroyOnLoadシングルトン。
 /// </summary>
 [RequireComponent(typeof(Image))]
 public class ScreenFader : MonoBehaviour
@@ -21,9 +21,11 @@ public class ScreenFader : MonoBehaviour
     [CustomLabel("全開放時の半径"), SerializeField]
     private float openRadius = 1.5f;
 
-    private Image _image;
-    private Material _material;
+    private Image image;
+    private Material material;
+
     private static readonly int RadiusID = Shader.PropertyToID("_Radius");
+    private static readonly int AspectRatioID = Shader.PropertyToID("_AspectRatio");
 
     private void Awake()
     {
@@ -36,11 +38,11 @@ public class ScreenFader : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        _image = GetComponent<Image>();
+        image = GetComponent<Image>();
 
-        // 共有マテリアルを書き換えないようインスタンス化
-        _material = new Material(_image.material);
-        _image.material = _material;
+        // 共有マテリアルを書き換えないようインスタンス化する
+        material = new Material(image.material);
+        image.material = material;
 
         UpdateAspectRatio();
 
@@ -62,43 +64,37 @@ public class ScreenFader : MonoBehaviour
     {
         UpdateAspectRatio();
 
-        // シーンロード直後は画面が閉じた(黒)状態から始め、
-        // 広がるフェードでリスポーン感を出す
+        // シーンロード直後は画面が閉じた（黒）状態から始め、広がるフェードでリスポーン感を出す
         FadeIn();
     }
 
     private void UpdateAspectRatio()
     {
-        _material.SetFloat("_AspectRatio", (float)Screen.width / Screen.height);
+        material.SetFloat(AspectRatioID, (float)Screen.width / Screen.height);
     }
 
     private void SetRadius(float radius)
     {
-        _material.SetFloat(RadiusID, radius);
+        material.SetFloat(RadiusID, radius);
     }
 
-    /// <summary>
-    /// 周囲から丸く閉じていく（死亡演出）
-    /// </summary>
+    /// <summary>周囲から丸く閉じていく（死亡演出）</summary>
     public Tween FadeOut(System.Action onComplete = null)
     {
         SE.Fade.Play();
 
-        return DOTween.To(() => _material.GetFloat(RadiusID), SetRadius, 0f, fadeDuration)
+        return DOTween.To(() => material.GetFloat(RadiusID), SetRadius, 0f, fadeDuration)
             .SetEase(Ease.InOutQuad)
             .OnComplete(() => onComplete?.Invoke());
     }
 
-    /// <summary>
-    /// 中心から丸く広がっていく（リスポーン演出）
-    /// </summary>
+    /// <summary>中心から丸く広がっていく（リスポーン演出）</summary>
     public Tween FadeIn(System.Action onComplete = null)
     {
         SetRadius(0f);
-
         SE.Fade.Play();
 
-        return DOTween.To(() => _material.GetFloat(RadiusID), SetRadius, openRadius, fadeDuration)
+        return DOTween.To(() => material.GetFloat(RadiusID), SetRadius, openRadius, fadeDuration)
             .SetEase(Ease.InOutQuad)
             .OnComplete(() => onComplete?.Invoke());
     }

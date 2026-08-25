@@ -1,10 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// リスポーン地点管理
-/// 
+/// リスポーン地点管理。
+///
 /// 惑星ごとのリスポーン地点をシーンをまたいで保持する。
-/// SoundManager 等と同じ DontDestroyOnLoad シングルトン。
+/// SoundManager等と同じDontDestroyOnLoadシングルトン。
 /// </summary>
 public class RespawnManager : MonoBehaviour
 {
@@ -15,7 +15,7 @@ public class RespawnManager : MonoBehaviour
     public Quaternion RespawnRotation { get; private set; } = Quaternion.identity;
 
     // まだ一度もリスポーン地点が設定されていないか
-    public bool HasRespawnPoint { get; private set; } = false;
+    public bool HasRespawnPoint { get; private set; }
 
     private void Awake()
     {
@@ -30,9 +30,7 @@ public class RespawnManager : MonoBehaviour
     }
 
     /// <summary>
-    /// リスポーン地点を更新する
-    /// 
-    /// point が null（その惑星に未設定）の場合は何もしない＝現状維持
+    /// リスポーン地点を更新する。pointがnull（その惑星に未設定）の場合は何もしない＝現状維持。
     /// </summary>
     public void SetRespawnPoint(Transform point)
     {

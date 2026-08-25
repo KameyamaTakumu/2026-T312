@@ -4094,7 +4094,6 @@ MonoBehaviour:
   targetObject: {fileID: 1625734450}
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 1648329966}
-  lookAtWhenShown: 1
   autoRevertTime: 3
   revertOnPlayerMove: 0
   moveInputThreshold: 0.1
@@ -4684,7 +4683,7 @@ MonoBehaviour:
   respawnPoint: {fileID: 457623275}
   planetBGM: 2
   overrideCameraPitch: 1
-  cameraPitchOverride: -20
+  cameraPitchOverride: 20
 --- !u!135 &472760410
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -5676,6 +5675,30 @@ PrefabInstance:
       propertyPath: m_VersionIndex
       value: 1050
       objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5797,7 +5820,7 @@ PrefabInstance:
       objectReference: {fileID: 1959413356}
     - target: {fileID: 707598829249916208, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
       propertyPath: m_VersionIndex
-      value: 1045
+      value: 1051
       objectReference: {fileID: 0}
     - target: {fileID: 2449763164937996881, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
       propertyPath: m_Mesh
@@ -5873,7 +5896,19 @@ PrefabInstance:
       objectReference: {fileID: 1214655690}
     - target: {fileID: 8647515556264393582, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
       propertyPath: m_VersionIndex
-      value: 1053
+      value: 1059
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13713,7 +13748,6 @@ MonoBehaviour:
   targetObject: {fileID: 1422218731}
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 1639984685}
-  lookAtWhenShown: 1
   autoRevertTime: 3
   revertOnPlayerMove: 1
   moveInputThreshold: 0.1
@@ -14456,7 +14490,6 @@ MonoBehaviour:
   targetObject: {fileID: 1128447977}
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 1382631487}
-  lookAtWhenShown: 1
   autoRevertTime: 3
   revertOnPlayerMove: 1
   moveInputThreshold: 0.1
@@ -17649,7 +17682,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8800061634085818574, guid: ba82cb8c8b3f09e45b4b02c963d1a9a3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 37.5
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8800061634085818574, guid: ba82cb8c8b3f09e45b4b02c963d1a9a3, type: 3}
       propertyPath: m_LocalPosition.z
@@ -18064,7 +18097,6 @@ MonoBehaviour:
   targetObject: {fileID: 0}
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 620029424}
-  lookAtWhenShown: 1
   autoRevertTime: 3
   revertOnPlayerMove: 1
   moveInputThreshold: 0.1
@@ -22191,6 +22223,30 @@ PrefabInstance:
     - target: {fileID: 8647515556264393582, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
       propertyPath: m_VersionIndex
       value: 1050
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8928261395871638178, guid: 8f5ea72b38bad7c488eecd9e74f94d39, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
