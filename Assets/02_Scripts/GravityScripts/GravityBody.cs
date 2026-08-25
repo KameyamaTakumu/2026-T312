@@ -208,15 +208,12 @@ public class GravityBody : MonoBehaviour
         GravityJumpZone arrived = _currentZone;
         GravityJumpZone next = arrived.NextZone;
 
-        Debug.Log($"引力ゾーンに到着：{arrived.gameObject.name}。次ゾーン：{(next != null ? next.gameObject.name : "なし（終点）")}");
-
         if (next != null)
         {
             // ── 中継ゾーン：飛行を止めずに次ゾーンへ切り替える ──
             // 速度は引き継ぎ（急ブレーキなし）次ゾーンの引力で自然に加速する
             _currentZone = next;
             _prevAttractedPos = _rb.position;
-            Debug.Log($"リレー継続 → {next.gameObject.name}");
         }
         else
         {
@@ -236,7 +233,6 @@ public class GravityBody : MonoBehaviour
                 // GravityAttractor の引力と合わさって自然に引き寄せられる
                 Vector3 toPlanet = (_forcedAttractor.transform.position - _rb.position).normalized;
                 _rb.linearVelocity = toPlanet * gravityJumpForce;
-                Debug.Log($"終点到着。惑星 {_forcedAttractor.gameObject.name} へ発射");
             }
             else
             {
@@ -277,14 +273,10 @@ public class GravityBody : MonoBehaviour
                 if (z != null)
                 {
                     _currentZone = z;
-                    Debug.Log($"惑星固定解除。ゾーン再取得：{z.gameObject.name}");
                     break;
                 }
             }
         }
-
-        if (_currentZone == null)
-            Debug.Log("惑星固定解除。通常重力に復帰");
     }
 
     // ─────────────────────────────────────────
@@ -302,7 +294,6 @@ public class GravityBody : MonoBehaviour
         _rb.linearVelocity = dir * gravityJumpForce;
         _prevAttractedPos = _rb.position;
 
-        Debug.Log($"引力ジャンプ開始：{_currentZone.gameObject.name}");
         return true;
     }
 
@@ -321,15 +312,13 @@ public class GravityBody : MonoBehaviour
             if (_currentZone != null && zone == _currentZone.NextZone)
             {
                 _currentZone = zone;
-                Debug.Log($"TriggerEnter リレー切替 → {zone.gameObject.name}");
             }
             return;
         }
 
         // 通常状態：侵入ゾーンを登録
         _currentZone = zone;
-        Debug.Log($"引力ゾーン侵入：{zone.gameObject.name}");
-    }
+        }
 
     public void OnExitGravityJumpZone(GravityJumpZone zone)
     {
@@ -339,7 +328,6 @@ public class GravityBody : MonoBehaviour
         if (_currentZone == zone)
         {
             _currentZone = null;
-            Debug.Log($"引力ゾーン退出：{zone.gameObject.name}");
         }
     }
 

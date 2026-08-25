@@ -38,7 +38,6 @@ public class PlanetWarpUI : MonoBehaviour
     {
         if (fadeImage == null)
         {
-            Debug.LogWarning("fadeImage ‚ª–¢İ’è‚Å‚·");
             return;
         }
 

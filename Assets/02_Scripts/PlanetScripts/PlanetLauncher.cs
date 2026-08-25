@@ -46,10 +46,7 @@ public class PlanetLauncher : MonoBehaviour
         // 目標惑星未設定
         if (targetPlanet == null)
         {
-            Debug.LogWarning(
-                $"目標惑星が未設定です: {gameObject.name}"
-            );
-            return;
+           return;
         }
 
         PlanetWarpManager manager =
@@ -58,9 +55,6 @@ public class PlanetLauncher : MonoBehaviour
         // Manager 未存在
         if (manager == null)
         {
-            Debug.LogError(
-                "シーンに PlanetWarpManager が見つかりません"
-            );
             return;
         }
 

@@ -68,8 +68,6 @@ public class SpinSwitchGroup : MonoBehaviour
 
         // インスペクタ表示用
         registeredCount = switches.Count;
-
-        Debug.Log($"{sw.SwitchId}を登録 （計{registeredCount}個）");
     }
 
     /// <summary>
@@ -90,8 +88,6 @@ public class SpinSwitchGroup : MonoBehaviour
         }
 
         activatedCount = count;
-
-        Debug.Log($"起動済み {activatedCount} / {registeredCount}");
 
         // 全スイッチ起動判定
         // 0個で即クリアにならないように登録数 > 0 の条件も追加する
@@ -114,8 +110,6 @@ public class SpinSwitchGroup : MonoBehaviour
         // 状態初期化
         activatedCount = 0;
         allActivated = false;
-
-        Debug.Log($"全スイッチをリセットしました");
     }
 
     // ─────────────────────────────────────────
@@ -128,8 +122,6 @@ public class SpinSwitchGroup : MonoBehaviour
     private void OnAllSwitchesActivated()
     {
         allActivated = true;
-
-        Debug.Log($"全スイッチが起動しました" );
 
         // UnityEvent 発火
         onAllActivated?.Invoke();

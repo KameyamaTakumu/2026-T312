@@ -24,11 +24,6 @@ public class ButtonSEBinder : MonoBehaviour
         if (SoundManager.Instance != null)
         {
             SoundManager.Instance.PlaySE(seType);
-            Debug.Log($"[ButtonSEBinder] '{buttonName}' ボタンで {seType} を再生しました。");
-        }
-        else
-        {
-            Debug.LogWarning("[ButtonSEBinder] SoundManagerが見つかりません。");
         }
     }
 }

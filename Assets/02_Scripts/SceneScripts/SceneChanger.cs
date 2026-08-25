@@ -54,16 +54,9 @@ public class SceneChanger : MonoBehaviour
             {
                 destination = TutorialEntryContext.EntryScene;
             }
-            else
-            {
-                Debug.LogWarning(
-                    "SceneChanger: 遷移元シーンが記録されていません。フォールバック先（sceneObject）を使用します。");
-            }
         }
 
         if (destination != null)
             destination.Load();
-        else
-            Debug.LogError("SceneChanger: 遷移先のSceneObjectが設定されていません。");
     }
 }

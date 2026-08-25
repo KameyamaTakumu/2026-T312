@@ -152,8 +152,6 @@ public class PlayerHealth : MonoBehaviour
         {
             ReloadScene();
         }
-
-        Debug.Log("[PlayerHealth] ƒvƒŒƒCƒ„[‚ª€–S‚µ‚Ü‚µ‚½");
     }
 
     /// <summary>

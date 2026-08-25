@@ -164,7 +164,6 @@ public class StarPointer : MonoBehaviour
         // Prefab –¢İ’è
         if (launchedCoinPrefab == null)
         {
-            Debug.LogWarning("[StarPointer] ”­ËƒRƒCƒ“ Prefab ‚ª–¢İ’è‚Å‚·");
             return;
         }
 

@@ -230,9 +230,6 @@ public class SoundManager : MonoBehaviour
     {
         int idx = (int)index;
 
-        // Œ»İÄ¶‚³‚ê‚Ä‚¢‚éBGM
-        Debug.Log($"Current BGM Index: {currentBGMIndex}, Requested BGM Index: {idx}");
-
         // “¯‚¶BGMÄ¶’†‚È‚ç‰½‚à‚µ‚È‚¢
         if (currentBGMIndex == idx &&
             bgmSource.isPlaying)

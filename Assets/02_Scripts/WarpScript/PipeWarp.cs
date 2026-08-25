@@ -57,8 +57,7 @@ public class PipeWarp : MonoBehaviour
         // 接続先が設定されていなければワープできないので警告して終了
         if (connectedPipe == null)
         {
-            Debug.LogWarning($"[PipeWarp] 接続先が未設定です: {gameObject.name}");
-            return;
+           return;
         }
 
         // プレイヤー本体、または親オブジェクトからRigidbodyを取得
@@ -103,8 +102,6 @@ public class PipeWarp : MonoBehaviour
         // これにより、出てきた瞬間に出口側の入口判定へ触れても
         // 即座に逆方向へ再ワープしてしまうことを防ぐ。
         connectedPipe.StartCoroutine(connectedPipe.CooldownCoroutine());
-
-        Debug.Log($"[PipeWarp] {gameObject.name} → {connectedPipe.gameObject.name} へワープ");
 
         // lockDuration経過後に操作を再度有効化するコルーチンを開始
         StartCoroutine(ReenableControlCoroutine(ctrl));

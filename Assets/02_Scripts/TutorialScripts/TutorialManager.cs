@@ -183,8 +183,6 @@ public class TutorialManager : MonoBehaviour
 
         if (globalVolume != null && globalVolume.profile.TryGet(out depthOfField))
             SwitchDepthOfField(true);
-        else
-            Debug.LogError("DepthOfField is not found in the global volume");
 
         BGM.Tutorial.Play();
 
@@ -540,8 +538,6 @@ public class TutorialManager : MonoBehaviour
 
             GameObject obj = Instantiate(data.prefab, data.position, Quaternion.Euler(data.rotation));
             spawnedObjects.Add(obj);
-
-            Debug.Log($"オブジェクト出現：{data.prefab.name} Pos={data.position} Rot={data.rotation}");
         }
     }
 
@@ -572,13 +568,11 @@ public class TutorialManager : MonoBehaviour
         GameObject zoneObj = GameObject.Find(step.goalZoneObjectName);
         if (zoneObj == null)
         {
-            Debug.LogWarning($"GoalZone '{step.goalZoneObjectName}' が見つかりません");
             return;
         }
 
         currentGoalZone = zoneObj.GetComponent<TutorialGoalZone>();
         zoneObj.SetActive(true);
-        Debug.Log($"GoalZone有効化：{step.goalZoneObjectName}");
     }
 
     // ─────────────────────────────────────────

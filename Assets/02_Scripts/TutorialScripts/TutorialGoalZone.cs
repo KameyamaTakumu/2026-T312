@@ -51,8 +51,7 @@ public class TutorialGoalZone : MonoBehaviour
         col = GetComponent<Collider>();
         if (col == null)
         {
-            Debug.LogError($"[TutorialGoalZone] '{zoneName}' にColliderが設定されていません");
-            return;
+           return;
         }
 
         col.isTrigger = true;
@@ -84,7 +83,6 @@ public class TutorialGoalZone : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null)
         {
-            Debug.LogWarning("[TutorialGoalZone] Playerタグのオブジェクトが見つかりません（矢印スキップ）");
             return;
         }
 
@@ -93,7 +91,6 @@ public class TutorialGoalZone : MonoBehaviour
         GoalZoneArrow arrow = arrowInstance.GetComponent<GoalZoneArrow>();
         if (arrow == null)
         {
-            Debug.LogWarning("[TutorialGoalZone] arrowPrefabにGoalZoneArrowコンポーネントがありません");
             return;
         }
 
@@ -102,8 +99,6 @@ public class TutorialGoalZone : MonoBehaviour
             arrow.SetHeadOffset(headOffsetOverride);
 
         arrow.Initialize(player.transform, transform);
-
-        Debug.Log($"[TutorialGoalZone] '{zoneName}' の矢印を生成");
     }
 
     private void DestroyArrow()
@@ -122,8 +117,6 @@ public class TutorialGoalZone : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
-
-        Debug.Log($"[TutorialGoalZone] '{zoneName}' に到達");
 
         TutorialManager.Instance?.NotifyReachedGoalZone(zoneName);
 

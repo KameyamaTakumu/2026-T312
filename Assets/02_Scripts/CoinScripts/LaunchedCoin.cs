@@ -206,8 +206,6 @@ public class LaunchedCoin : MonoBehaviour
             //if (enemyBase.IsDead)
             //    TutorialManager.Instance?.NotifyCoinHitEnemy();
         }
-        else
-            Debug.Log($"[LaunchedCoin] ìGÇ…ñΩíÜÅiEnemyBase Ç»ÇµÅj: {enemy.name}");
     }
 
     /// <summary>

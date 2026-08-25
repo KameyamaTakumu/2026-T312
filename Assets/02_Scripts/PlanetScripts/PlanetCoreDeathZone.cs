@@ -81,20 +81,12 @@ public class PlanetCoreDeathZone : MonoBehaviour
         if (gravityBody != null &&
             gravityBody.IsBeingAttracted)
         {
-            Debug.Log(
-                "[PlanetCoreDeathZone] 引力ジャンプ中のためスキップ");
-
             return;
         }
 
         // ─────────────────────
         // 即死処理
         // ─────────────────────
-
-        // PlayerHealth側で
-        // 死亡演出やリスポーン処理が行われる。
-        Debug.Log(
-            $"[PlanetCoreDeathZone] {gameObject.name} の中心核に触れました。即死");
 
         playerHealth.InstantKill();
     }

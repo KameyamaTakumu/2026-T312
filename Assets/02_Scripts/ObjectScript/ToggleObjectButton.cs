@@ -21,7 +21,6 @@ public class ToggleObjectButton : MonoBehaviour
     {
         if (targetObject == null)
         {
-            Debug.LogWarning("ToggleObjectButton : targetObject ‚ªİ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ");
             return;
         }
 

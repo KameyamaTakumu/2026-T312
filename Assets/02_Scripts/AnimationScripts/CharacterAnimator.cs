@@ -133,8 +133,6 @@ public class CharacterAnimator : MonoBehaviour
         // Config未設定なら動作できない
         if (config == null)
         {
-            Debug.LogWarning(
-                "[PlayerAnimator] Config が未設定です。インスペクターで PlayerAnimatorConfig をセットしてください。");
             return;
         }
 
@@ -147,17 +145,6 @@ public class CharacterAnimator : MonoBehaviour
         // 手作業で作る必要がなくなる。
         _anim.runtimeAnimatorController =
             config.BuildControllerEditor(gameObject);
-
-#else
-
-        // ビルド後は自動生成が使えないため、
-        // 事前にControllerを作成しておく必要がある。
-        if (_anim.runtimeAnimatorController == null)
-        {
-            Debug.LogWarning(
-                "[PlayerAnimator] ランタイムビルドでは自動生成非対応。エディターで Animator Controller をアセット化してください。");
-        }
-
 #endif
     }
 

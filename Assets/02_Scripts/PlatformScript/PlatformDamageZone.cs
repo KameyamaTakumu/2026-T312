@@ -52,9 +52,6 @@ public class PlatformDamageZone : MonoBehaviour
 
         // ダメージを与える
         playerHealth.TakeDamage(damage);
-
-        Debug.Log(
-            $"プレイヤーに {damage} ダメージ");
     }
 
     /// <summary>

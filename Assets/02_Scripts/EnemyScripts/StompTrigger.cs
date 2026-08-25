@@ -23,14 +23,6 @@ public class StompTrigger : MonoBehaviour
         // StompTrigger は敵本体の子に付ける前提なので、
         // GetComponentInParent を使用している
         enemyBase = GetComponentInParent<EnemyBase>();
-
-        // EnemyBase が見つからない場合は設定ミス
-        if (enemyBase == null)
-        {
-            Debug.LogWarning(
-                $"[StompTrigger] 親に EnemyBase が見つかりません: {gameObject.name}"
-            );
-        }
     }
 
     /// <summary>

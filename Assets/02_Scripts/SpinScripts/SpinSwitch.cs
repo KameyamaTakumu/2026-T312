@@ -135,8 +135,6 @@ public class SpinSwitch : MonoBehaviour
         // ? 演算子により null チェック付きで安全に呼び出す
         onActivated?.Invoke();
 
-        Debug.Log($"{switchId}が起動しました");
-
         render.material = OnMaterial;
 
         // Group に通知
