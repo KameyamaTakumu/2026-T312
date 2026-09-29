@@ -17,11 +17,11 @@ public class ObjectBoard : MonoBehaviour
             if (mainCam == null) return;
         }
 
-        // カメラと同じ向き + カメラの up を使って、ロールも一致させる
-        transform.rotation = Quaternion.LookRotation(
-            mainCam.transform.forward,
-            mainCam.transform.up);
+        //// カメラと同じ向き + カメラの up を使って、ロールも一致させる
+        //transform.rotation = Quaternion.LookRotation(
+        //    mainCam.transform.forward,
+        //    mainCam.transform.up);
 
-        //transform.forward = mainCam.transform.forward;
+        transform.forward = mainCam.transform.forward;
     }
 }

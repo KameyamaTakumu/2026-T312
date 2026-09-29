@@ -98,7 +98,5 @@ public class ObjectFocusInteraction : MonoBehaviour
 
         Vector3 planetUp = (target.position - planetCenter.position).normalized;
         Vector3 toBoard = (target.position - cam.position).normalized;
-
-        //cam.rotation = Quaternion.LookRotation(toBoard, planetUp);
     }
 }

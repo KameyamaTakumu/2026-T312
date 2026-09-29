@@ -17227,7 +17227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2064f5c190f31c4596ac6ab5fa2b4fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 0}
+  targetObject: {fileID: 5850601}
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 620029424}
   autoRevertTime: 3
