@@ -15,12 +15,16 @@ public class ObjectFocusInteraction : MonoBehaviour
     [SerializeField] private string enterPromptMessage = "Eキーで注目する";
     [SerializeField] private string exitPromptMessage = "Eキーで元に戻す";
 
+    [SerializeField] private Transform planetCenter; // 惑星の中心
+
     private bool playerInRange = false;
     private bool isFocusing = false;
 
     private void Start()
     {
         focusCamera.Priority = normalPriority;
+        AlignFocusCamera();
+
         if (promptUI != null)
             promptUI.SetActive(false);
 
@@ -85,5 +89,16 @@ public class ObjectFocusInteraction : MonoBehaviour
     {
         if (promptUI != null)
             promptUI.SetActive(show);
+    }
+
+    private void AlignFocusCamera()
+    {
+        Transform cam = focusCamera.transform;
+        Transform target = focusCamera.Target.TrackingTarget; // SignBoard
+
+        Vector3 planetUp = (target.position - planetCenter.position).normalized;
+        Vector3 toBoard = (target.position - cam.position).normalized;
+
+        //cam.rotation = Quaternion.LookRotation(toBoard, planetUp);
     }
 }

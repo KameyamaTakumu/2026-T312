@@ -1535,7 +1535,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1450655989873962676}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: b2402b69fe07ed443bb11ee1b7d655ff, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1763,6 +1763,7 @@ MonoBehaviour:
   promptText: {fileID: 6864866609974014436}
   enterPromptMessage: "E\u30AD\u30FC\u3067\u6CE8\u76EE\u3059\u308B"
   exitPromptMessage: "E\u30AD\u30FC\u3067\u5143\u306B\u623B\u3059"
+  planetCenter: {fileID: 0}
 --- !u!1 &5388259993896394529
 GameObject:
   m_ObjectHideFlags: 0
@@ -2286,7 +2287,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5545832642846402825}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: b2402b69fe07ed443bb11ee1b7d655ff, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
