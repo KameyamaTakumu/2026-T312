@@ -105,7 +105,6 @@ public class PlayerSpin : MonoBehaviour
         isSpinning = true;
         spinTimer = 0f;
 
-        anim.SetTrigger("SpinTrigger");
         TutorialManager.Instance?.NotifySpin();
 
         // スピン開始と同時に攻撃判定を行う

@@ -2076,13 +2076,14 @@ MonoBehaviour:
   deceleration: 40
   airAcceleration: 20
   jumpForce: 5
+  fallExtraGravity: 25
+  maxFallSpeed: 40
   groundCheckDistance: 0.05
   groundLayer:
     serializedVersion: 2
     m_Bits: 4294967295
   cameraTransform: {fileID: 0}
   rotationSpeed: 100
-  cameraSmooth: 2
   cameraTurnSpeed: 120
   cameraPitch: 45
   pitchTransitionSpeed: 60
@@ -2117,7 +2118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spinDuration: 0.4
   spinCooldown: 0.6
-  spinRadius: 1.5
+  spinRadius: 2
   spinHeightOffset: 1
   spinDamage: 1
   spinMoveMultiplier: 0.4

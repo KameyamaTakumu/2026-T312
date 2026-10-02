@@ -17,6 +17,22 @@ public class RespawnManager : MonoBehaviour
     // まだ一度もリスポーン地点が設定されていないか
     public bool HasRespawnPoint { get; private set; }
 
+    // ─────────────────────────────────────────
+    // 復帰データ（チュートリアルなど別シーンから戻る用）
+    // ─────────────────────────────────────────
+
+    /// <summary>チュートリアルへ移動する時点のゲーム状態</summary>
+    public class ResumeSnapshot
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+        public string sceneName;      // 保存した時のシーン（別シーンでの誤復元防止）
+        public int coinCount;
+        public System.Collections.Generic.List<string> shownIds = new System.Collections.Generic.List<string>();
+    }
+
+    private ResumeSnapshot resumeSnapshot;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -40,5 +56,35 @@ public class RespawnManager : MonoBehaviour
         RespawnPosition = point.position;
         RespawnRotation = point.rotation;
         HasRespawnPoint = true;
+    }
+
+    /// <summary>復帰データを保存する（チュートリアルへ移動する直前に呼ぶ）</summary>
+    public void SaveResume(ResumeSnapshot snapshot)
+    {
+        resumeSnapshot = snapshot;
+    }
+
+    /// <summary>復帰データを削除する（タイトルへ戻る時・リスポーン時に呼ぶ）</summary>
+    public void ClearResumePoint()
+    {
+        resumeSnapshot = null;
+    }
+
+    /// <summary>
+    /// 現在のシーンに対応する復帰データがあれば取り出す。
+    /// 取り出した時点で削除するので、復元は1回だけ行われる。
+    /// </summary>
+    public bool TryConsumeResume(string currentSceneName, out ResumeSnapshot snapshot)
+    {
+        snapshot = resumeSnapshot;
+
+        if (snapshot == null || snapshot.sceneName != currentSceneName)
+        {
+            snapshot = null;
+            return false;
+        }
+
+        resumeSnapshot = null;
+        return true;
     }
 }

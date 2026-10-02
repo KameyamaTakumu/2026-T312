@@ -15,6 +15,16 @@ public class ObjectVisibilityController : MonoBehaviour
     [Header("表示・非表示を切り替えるオブジェクト")]
     [SerializeField] private GameObject targetObject;
 
+    // 解放状況の保存に使うID。シーン内で重複しない名前にする
+    // 空の場合は GameObject 名を使う
+    [CustomLabel("保存用ID（空=オブジェクト名）"), SerializeField]
+    private string saveId;
+
+    public string SaveId => string.IsNullOrEmpty(saveId) ? gameObject.name : saveId;
+
+    /// <summary>対象が現在表示されているか</summary>
+    public bool IsShown => targetObject != null && targetObject.activeSelf;
+
     [Header("通常時のカメラ")]
     [SerializeField] private CinemachineCamera mainCamera;
 
@@ -160,5 +170,15 @@ public class ObjectVisibilityController : MonoBehaviour
         {
             Show();
         }
+    }
+
+    /// <summary>
+    /// 復帰時に表示状態だけ復元する。
+    /// カメラ演出（惑星カメラへの切り替え）は行わない
+    /// </summary>
+    public void RestoreShown()
+    {
+        if (targetObject != null)
+            targetObject.SetActive(true);
     }
 }

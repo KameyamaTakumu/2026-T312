@@ -57,6 +57,20 @@ public abstract class EnemyBase : MonoBehaviour
     [CustomLabel("プレイヤーに与えるダメージ量"), SerializeField]
     private int damageToPlayer = 1;
 
+    [Header("ダメージエフェクト")]
+
+    // ダメージを受けた時に再生するエフェクトPrefab
+    [CustomLabel("被ダメージエフェクト Prefab（未設定=再生しない）"), SerializeField]
+    private GameObject hitEffectPrefab;
+
+    // エフェクトの自動削除までの時間
+    [CustomLabel("エフェクトの生存時間（秒）"), SerializeField]
+    private float hitEffectLifetime = 2f;
+
+    // 敵の中心から惑星の上方向へのオフセット（コイン以外のヒット時に使用）
+    [CustomLabel("エフェクト位置の上方向オフセット"), SerializeField]
+    private float hitEffectUpOffset = 0.5f;
+
     [Header("追跡設定")]
 
     // プレイヤー検知範囲
@@ -97,6 +111,9 @@ public abstract class EnemyBase : MonoBehaviour
     // 死亡済みか
     protected bool isDead = false;
 
+    // コインが当たった位置（コイン以外のダメージでは null）
+    private Vector3? pendingHitPoint;
+
     // ダメージ直後の無敵状態
     // 多段ヒット防止用
     private bool invincible = false;
@@ -128,6 +145,9 @@ public abstract class EnemyBase : MonoBehaviour
 
         // 徘徊・原点復帰の基準点として、スポーン時の位置を記録する
         originPosition = transform.position;
+
+        // 最初の呼び出しで徘徊目標を選ばせる
+        wanderTimer = wanderInterval;
     }
 
     protected virtual void OnCollisionEnter(Collision collision)
@@ -236,12 +256,14 @@ public abstract class EnemyBase : MonoBehaviour
     /// <summary>
     /// コイン攻撃ダメージ
     /// </summary>
-    public void TakeDamageFromCoin(int amount)
+    public void TakeDamageFromCoin(int amount, Vector3? hitPoint = null)
     {
         if (!vulnerableToCoin)
             return;
 
+        pendingHitPoint = hitPoint;
         TakeDamage(amount);
+        pendingHitPoint = null;
     }
 
     /// <summary>
@@ -254,6 +276,9 @@ public abstract class EnemyBase : MonoBehaviour
             return;
 
         currentHp -= amount;
+
+        // ダメージエフェクト（死亡する一撃でも再生される）
+        PlayHitEffect();
 
         // 継承先フック
         OnDamaged(amount);
@@ -307,6 +332,23 @@ public abstract class EnemyBase : MonoBehaviour
         yield return new WaitForSeconds(invincibleDuration);
 
         invincible = false;
+    }
+
+    /// <summary>
+    /// ダメージエフェクトを再生する
+    /// 敵の子にはせず独立して生成するので、敵が死んで Destroy されても最後まで再生される
+    /// </summary>
+    private void PlayHitEffect()
+    {
+        if (hitEffectPrefab == null)
+            return;
+
+        // コインのヒット位置があればそこ、無ければ敵の中心付近
+        Vector3 pos = pendingHitPoint
+            ?? (transform.position + transform.up * hitEffectUpOffset);
+
+        GameObject fx = Instantiate(hitEffectPrefab, pos, Quaternion.identity);
+        Destroy(fx, hitEffectLifetime);
     }
 
     // ─────────────────────────────────────────

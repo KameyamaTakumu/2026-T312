@@ -71,13 +71,10 @@ MonoBehaviour:
     - FromAnyState: 0
       CanTransitionToSelf: 1
       ToState: Ground
-      HasExitTime: 0
+      HasExitTime: 1
       ExitTime: 1
-      Duration: 0
-      Conditions:
-      - Parameter: SpinTrigger
-        Mode: 1
-        Threshold: 0
+      Duration: 0.1
+      Conditions: []
   ParameterDrivers:
   - rid: 3238349885222420572
   - rid: 3238349885222420573

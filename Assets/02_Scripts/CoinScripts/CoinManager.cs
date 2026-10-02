@@ -88,4 +88,14 @@ public class CoinManager : MonoBehaviour
         if (coinText != null)
             coinText.text = $"× {coinCount:00}";
     }
+
+    /// <summary>
+    /// コイン枚数を直接設定する（チュートリアルからの復帰用）
+    /// SE は鳴らさない
+    /// </summary>
+    public void SetCoins(int amount)
+    {
+        coinCount = Mathf.Clamp(amount, 0, maxCoinCount);
+        UpdateUI();
+    }
 }

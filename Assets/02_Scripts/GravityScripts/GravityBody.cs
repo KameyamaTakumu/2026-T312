@@ -27,7 +27,6 @@ public class GravityBody : MonoBehaviour
     // ─────────────────────────────────────────
 
     private Rigidbody _rb;
-    private GravityAttractor[] _attractors;
 
     // 現在重力を受けている惑星（GroundedLock 解除後の引き継ぎにも使用）
     private GravityAttractor _currentAttractor;
@@ -85,11 +84,6 @@ public class GravityBody : MonoBehaviour
         _rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
-    private void Start()
-    {
-        _attractors = Object.FindObjectsByType<GravityAttractor>();
-    }
-
     private void FixedUpdate()
     {
         if (_isBeingAttracted)
@@ -104,7 +98,7 @@ public class GravityBody : MonoBehaviour
 
     private void UpdateGravity()
     {
-        if (_attractors == null || _attractors.Length == 0) return;
+        if (GravityAttractor.All.Count == 0) return;
 
         GravityAttractor target;
 
@@ -121,16 +115,23 @@ public class GravityBody : MonoBehaviour
             // _currentAttractor は次の GetNearestAttractor() 呼び出しで上書きされる
             target = _currentAttractor;
 
-            // 惑星間の重なり問題を避けるため、接地した惑星が引力圏にある間は
-            // 近くても他の惑星を選ばないよう距離チェックで確認してから切り替え
+            //// 惑星間の重なり問題を避けるため、接地した惑星が引力圏にある間は
+            //// 近くても他の惑星を選ばないよう距離チェックで確認してから切り替え
             GravityAttractor nearest = GetNearestAttractor();
             if (nearest != null && nearest != _currentAttractor)
             {
-                // 現在惑星と最寄り惑星の距離差が一定以上なら切り替える
-                float distCurrent = Vector3.Distance(transform.position, _currentAttractor.transform.position);
-                float distNearest = Vector3.Distance(transform.position, nearest.transform.position);
-                if (distNearest < distCurrent * 0.7f)
+                // Box が関わる切り替えは、距離比較せずそのまま切り替える
+                if (nearest.IsBox || _currentAttractor.IsBox)
+                {
                     target = nearest;
+                }
+                else
+                {
+                    float distCurrent = Vector3.Distance(transform.position, _currentAttractor.transform.position);
+                    float distNearest = Vector3.Distance(transform.position, nearest.transform.position);
+                    if (distNearest < distCurrent * 0.7f)
+                        target = nearest;
+                }
             }
         }
         else
@@ -337,11 +338,31 @@ public class GravityBody : MonoBehaviour
 
     private GravityAttractor GetNearestAttractor()
     {
+        Vector3 pos = transform.position;
+
+        // ① 影響範囲内の Box があれば、表面に最も近いものを優先
+        GravityAttractor nearestBox = null;
+        float minBoxDist = float.MaxValue;
+        foreach (var a in GravityAttractor.All)
+        {
+            if (!a.IsBox) continue;
+            float d = a.GetSurfaceDistance(pos);
+            if (d <= a.InfluenceDistance && d < minBoxDist)
+            {
+                minBoxDist = d;
+                nearestBox = a;
+            }
+        }
+        if (nearestBox != null)
+            return nearestBox;
+
+        // ② なければ従来通り、中心が最も近い惑星
         GravityAttractor nearest = null;
         float minDist = float.MaxValue;
-        foreach (var a in _attractors)
+        foreach (var a in GravityAttractor.All)
         {
-            float d = Vector3.Distance(transform.position, a.transform.position);
+            if (a.IsBox) continue;
+            float d = Vector3.Distance(pos, a.transform.position);
             if (d < minDist) { minDist = d; nearest = a; }
         }
         return nearest;
@@ -349,9 +370,6 @@ public class GravityBody : MonoBehaviour
 
     public void ForceSyncGravity()
     {
-        if (_attractors == null || _attractors.Length == 0)
-            _attractors = Object.FindObjectsByType<GravityAttractor>();
-
         GravityAttractor nearest = GetNearestAttractor();
         if (nearest != null)
         {

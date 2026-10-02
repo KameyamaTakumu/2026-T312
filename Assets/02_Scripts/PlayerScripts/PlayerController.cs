@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// プレイヤーの移動・ジャンプ・カメラ追従を管理するコンポーネント。
@@ -34,6 +35,16 @@ public class PlayerController : MonoBehaviour
 
     [CustomLabel("ジャンプ力"), SerializeField]
     private float jumpForce = 14f;
+
+    [Header("落下設定")]
+
+    // 落下中だけ上乗せする重力加速度。大きいほど「しゅたっ」と落ちる
+    [CustomLabel("落下時の追加重力"), SerializeField]
+    private float fallExtraGravity = 25f;
+
+    // 落下速度の上限。高所から落ちた時に速くなりすぎるのを防ぐ
+    [CustomLabel("最大落下速度"), SerializeField]
+    private float maxFallSpeed = 40f;
 
     // 小さすぎると接地判定が不安定になる
     [CustomLabel("接地判定の距離"), SerializeField]
@@ -120,12 +131,32 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        if (RespawnManager.Instance != null && RespawnManager.Instance.HasRespawnPoint)
-        {
-            rb.position = RespawnManager.Instance.RespawnPosition;
-            rb.rotation = RespawnManager.Instance.RespawnRotation;
+        RespawnManager rm = RespawnManager.Instance;
 
-            // ワープ時と同様、リスポーン直後は重力方向がずれるため同期させる
+        if (rm != null && rm.TryConsumeResume(
+                SceneManager.GetActiveScene().name,
+                out RespawnManager.ResumeSnapshot snap))
+        {
+            // 座標・向き
+            rb.position = snap.position;
+            rb.rotation = snap.rotation;
+            grabody.ForceSyncGravity();
+
+            // コイン枚数
+            if (CoinManager.Instance != null)
+                CoinManager.Instance.SetCoins(snap.coinCount);
+
+            // 解放状況
+            foreach (var v in FindObjectsByType<ObjectVisibilityController>())
+            {
+                if (snap.shownIds.Contains(v.SaveId))
+                    v.RestoreShown();
+            }
+        }
+        else if (rm != null && rm.HasRespawnPoint)
+        {
+            rb.position = rm.RespawnPosition;
+            rb.rotation = rm.RespawnRotation;
             grabody.ForceSyncGravity();
         }
     }
@@ -160,6 +191,7 @@ public class PlayerController : MonoBehaviour
         UpdateCameraPitchTarget();
         HandleMove();
         HandleJump();
+        ApplyFallGravity();
 
         // 次フレームの比較用に、今フレームの床の水平速度を記憶する
         prevPlatformVelocity = currentPlatform != null
@@ -275,19 +307,28 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
             TutorialManager.Instance?.NotifyRunning(Time.fixedDeltaTime);
 
+
         Vector3 moveDirection = moveInputForward ? camForward : -camForward;
 
-        // プレイヤーの前方向を移動方向（＝カメラの前方向）へ滑らかに合わせる
-        Quaternion targetRotation = Quaternion.LookRotation(moveDirection, planetUp);
-        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * rotationSpeed));
+        // スピン中は PlayerSpin が回転を制御するので、向き合わせをしない
+        bool spinning = spin != null && spin.IsSpinning;
+        if (!spinning)
+        {
+            // プレイヤーの前方向を移動方向（＝カメラの前方向）へ滑らかに合わせる
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection, planetUp);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * rotationSpeed));
+        }
 
         // 重力方向速度を分離し、ジャンプ・落下による垂直速度を保持する
         Vector3 verticalVel = Vector3.Project(rb.linearVelocity, planetUp);
         Vector3 currentHorizontal = rb.linearVelocity - verticalVel;
 
+        // スピン中の移動速度倍率を反映
+        float speedMul = spin != null ? spin.SpinMoveMultiplier : 1f;
+
         // 目標水平速度＝床速度＋プレイヤー入力速度。
         // 床の上ではプレイヤーの入力が床基準の相対移動になる
-        Vector3 targetHorizontal = platformVelocity + moveDirection * moveSpeed;
+        Vector3 targetHorizontal = platformVelocity + moveDirection * moveSpeed * speedMul;
 
         float accel = isGrounded ? acceleration : airAcceleration;
         Vector3 newHorizontal = Vector3.MoveTowards(currentHorizontal, targetHorizontal, accel * Time.fixedDeltaTime);
@@ -314,6 +355,36 @@ public class PlayerController : MonoBehaviour
             SE.Jump.Play();
             TutorialManager.Instance?.NotifyJump();
         }
+    }
+
+    /// <summary>
+    /// 落下中のみ追加の重力をかけ、上昇より速く落ちるようにする
+    /// </summary>
+    private void ApplyFallGravity()
+    {
+        // 引力ジャンプの飛行中は GravityBody が移動を制御しているので何もしない
+        if (grabody.IsBeingAttracted)
+            return;
+
+        // 接地中は不要
+        if (isGrounded)
+            return;
+
+        Vector3 planetUp = rb.rotation * Vector3.up;
+
+        // 惑星の上方向に対する速度(マイナスなら落下中)
+        float verticalSpeed = Vector3.Dot(rb.linearVelocity, planetUp);
+
+        // 上昇中は通常の重力のまま
+        if (verticalSpeed >= 0f)
+            return;
+
+        // 落下中だけ追加の重力をかける
+        rb.AddForce(-planetUp * fallExtraGravity, ForceMode.Acceleration);
+
+        // 最大落下速度を超えたら上限に抑える
+        if (verticalSpeed < -maxFallSpeed)
+            rb.linearVelocity += planetUp * (-maxFallSpeed - verticalSpeed);
     }
 
     /// <summary>

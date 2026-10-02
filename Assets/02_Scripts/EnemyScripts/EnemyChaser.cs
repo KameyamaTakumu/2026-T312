@@ -90,15 +90,13 @@ public class EnemyChaser : EnemyBase
 
     private void FixedUpdate()
     {
-        if (isDead || playerTransform == null)
+        if (isDead)
             return;
 
-        // プレイヤー距離
-        float distToPlayer =
-            Vector3.Distance(
-                transform.position,
-                playerTransform.position
-            );
+        // プレイヤーがいない場合は距離を無限大として扱い、常に巡回状態にする
+        float distToPlayer = playerTransform != null
+            ? Vector3.Distance(transform.position, playerTransform.position)
+            : float.MaxValue;
 
         // ─────────────────────────────────────
         // 状態遷移

@@ -136,16 +136,16 @@ public class CharacterAnimator : MonoBehaviour
             return;
         }
 
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
 
-        // エディター上では
-        // ConfigからAnimatorControllerを自動生成する
-        //
-        // これによりAnimatorControllerを
-        // 手作業で作る必要がなくなる。
-        _anim.runtimeAnimatorController =
-            config.BuildControllerEditor(gameObject);
-#endif
+//        // エディター上では
+//        // ConfigからAnimatorControllerを自動生成する
+//        //
+//        // これによりAnimatorControllerを
+//        // 手作業で作る必要がなくなる。
+//        _anim.runtimeAnimatorController =
+//            config.BuildControllerEditor(gameObject);
+//#endif
     }
 
     /// <summary>

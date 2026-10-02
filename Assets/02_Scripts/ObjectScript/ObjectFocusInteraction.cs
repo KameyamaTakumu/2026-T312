@@ -67,7 +67,6 @@ public class ObjectFocusInteraction : MonoBehaviour
     {
         isFocusing = true;
         focusCamera.Priority = focusPriority;
-        //ShowPrompt(false); // ’–Ú’†‚Íƒvƒƒ“ƒvƒg‚ğ‰B‚·
 
         if (promptText != null)
             promptText.text = exitPromptMessage;

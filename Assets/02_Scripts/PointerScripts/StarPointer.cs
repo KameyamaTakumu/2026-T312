@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// スターポインター
@@ -140,7 +141,8 @@ public class StarPointer : MonoBehaviour
         // 左クリックでコイン発射
         // ─────────────────────────────────────────
 
-        if (Input.GetMouseButtonDown(0))
+        // UI(ボタンなど)の上をクリックした場合は発射しない
+        if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
             TryFireCoin(ray);
     }
 
@@ -209,6 +211,18 @@ public class StarPointer : MonoBehaviour
         // 発射開始
         if (lc != null)
             lc.Fire(launchDir, launchSpeed);
+    }
+
+    /// <summary>
+    /// マウスが UI の上にあるか判定
+    /// </summary>
+    private bool IsPointerOverUI()
+    {
+        // EventSystem がシーンに無い場合は UI 無しとして扱う
+        if (EventSystem.current == null)
+            return false;
+
+        return EventSystem.current.IsPointerOverGameObject();
     }
 
     /// <summary>

@@ -129,8 +129,8 @@ MonoBehaviour:
   hitsToBreak: 1
   respawns: 0
   respawnTime: 5
-  dropPrefab: {fileID: 0}
+  dropPrefab: {fileID: 1282157366893234392, guid: 43fa587d90f1aae478214514253dadfa, type: 3}
   dropCount: 1
-  dropForce: 4
+  dropForce: 0
   breakAnimDuration: 0.2
   hitShakeAmount: 0.1

@@ -445,6 +445,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 857e61b70557d6b488964a92357a11b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GravityAttractor
+  shape: 0
+  influenceDistance: 3
   gravity: -9.81
   respawnPoint: {fileID: 1854072966}
   planetBGM: 1
@@ -2840,7 +2842,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37
+      value: -39
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2919,7 +2921,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -3404,7 +3406,7 @@ MonoBehaviour:
     Enabled: 0
     DefaultMode: 2
   DefaultBlend:
-    Style: 1
+    Style: 0
     Time: 2
     CustomCurve:
       serializedVersion: 2
@@ -4096,6 +4098,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 1625734450}
+  saveId: 
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 1648329966}
   autoRevertTime: 3
@@ -4626,7 +4629,7 @@ PrefabInstance:
       objectReference: {fileID: 1659175829}
     - target: {fileID: 9219373840961592011, guid: efbd478695a639c40bbe7fc2bbf62a9e, type: 3}
       propertyPath: arrivalDistance
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4687,6 +4690,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 857e61b70557d6b488964a92357a11b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GravityAttractor
+  shape: 0
+  influenceDistance: 3
   gravity: -9.81
   respawnPoint: {fileID: 457623275}
   planetBGM: 2
@@ -5070,7 +5075,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9219373840961592011, guid: efbd478695a639c40bbe7fc2bbf62a9e, type: 3}
       propertyPath: arrivalDistance
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6596,7 +6601,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37
+      value: -39
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -6906,6 +6911,7 @@ MonoBehaviour:
   selfSceneObject:
     m_SceneName: 02_GameScene_01
   useRecordedEntryScene: 0
+  clearResumePoint: 0
 --- !u!114 &698962375 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8595363640836072179, guid: 0a9ee0ffcfedb2f409bc88eb720b167f, type: 3}
@@ -9813,7 +9819,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37
+      value: -39
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -9898,7 +9904,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37
+      value: -39
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -11831,7 +11837,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37
+      value: -39
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -12899,7 +12905,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37
+      value: -39
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -13049,6 +13055,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 1422218731}
+  saveId: 
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 1639984685}
   autoRevertTime: 3
@@ -13352,7 +13359,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37
+      value: -39
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -13791,6 +13798,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 1128447977}
+  saveId: 
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 1382631487}
   autoRevertTime: 3
@@ -16622,6 +16630,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 857e61b70557d6b488964a92357a11b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GravityAttractor
+  shape: 0
+  influenceDistance: 3
   gravity: -9.81
   respawnPoint: {fileID: 1854072966}
   planetBGM: 1
@@ -16801,6 +16811,10 @@ PrefabInstance:
       propertyPath: cameraTransform
       value: 
       objectReference: {fileID: 748621600}
+    - target: {fileID: 4802382397058616609, guid: ba82cb8c8b3f09e45b4b02c963d1a9a3, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 5ce42e7af95d5d54e8a99ac360dec905, type: 2}
     - target: {fileID: 6720316201817542305, guid: ba82cb8c8b3f09e45b4b02c963d1a9a3, type: 3}
       propertyPath: m_Name
       value: Player
@@ -16811,7 +16825,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8800061634085818574, guid: ba82cb8c8b3f09e45b4b02c963d1a9a3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 40
+      value: 38
       objectReference: {fileID: 0}
     - target: {fileID: 8800061634085818574, guid: ba82cb8c8b3f09e45b4b02c963d1a9a3, type: 3}
       propertyPath: m_LocalPosition.z
@@ -17228,6 +17242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetObject: {fileID: 5850601}
+  saveId: 
   mainCamera: {fileID: 748621599}
   planetCamera: {fileID: 620029424}
   autoRevertTime: 3
@@ -17719,6 +17734,7 @@ MonoBehaviour:
   selfSceneObject:
     m_SceneName: 
   useRecordedEntryScene: 0
+  clearResumePoint: 1
 --- !u!114 &1593436819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18342,6 +18358,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 857e61b70557d6b488964a92357a11b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GravityAttractor
+  shape: 0
+  influenceDistance: 3
   gravity: -9.81
   respawnPoint: {fileID: 820009069}
   planetBGM: 0
@@ -18832,7 +18850,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9219373840961592011, guid: efbd478695a639c40bbe7fc2bbf62a9e, type: 3}
       propertyPath: arrivalDistance
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18974,6 +18992,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 857e61b70557d6b488964a92357a11b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GravityAttractor
+  shape: 0
+  influenceDistance: 3
   gravity: -9.81
   respawnPoint: {fileID: 820009069}
   planetBGM: 0
@@ -23662,7 +23682,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9219373840961592011, guid: efbd478695a639c40bbe7fc2bbf62a9e, type: 3}
       propertyPath: arrivalDistance
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24139,7 +24159,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37
+      value: -39
       objectReference: {fileID: 0}
     - target: {fileID: 3742856344213059110, guid: 439214cbf7c8f9b4996cd05e9bf1fbb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -24259,6 +24279,67 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b33c0cd0a3e2d3a4aaf8b402a9df8a17, type: 3}
+--- !u!1001 &2228267212545077087
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 251161572710030044, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_Name
+      value: Planet
+      objectReference: {fileID: 0}
+    - target: {fileID: 6055004006516472968, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: respawnPoint
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6891745596921456231, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
 --- !u!4 &2284661622965142753 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8636127547292289953, guid: 9cab222c6a99f334ba85b329de0c0c1a, type: 3}
@@ -24930,3 +25011,4 @@ SceneRoots:
   - {fileID: 1730998811}
   - {fileID: 1730566992}
   - {fileID: 1291808909}
+  - {fileID: 2228267212545077087}
