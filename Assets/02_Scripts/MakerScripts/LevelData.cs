@@ -9,6 +9,7 @@ public class PlacedData
     public Vector3 pos;
     public Quaternion rot;
     public float scale = 1f;
+    public string pairId;
 }
 
 [Serializable]
@@ -22,4 +23,5 @@ public class PlacedObject : MonoBehaviour
 {
     public string id;
     public float scale = 1f;
+    public string pairId;
 }

@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: "\u8FFD\u5C3E\u6575 Prefab"
   m_EditorClassIdentifier: Assembly-CSharp::PlaceableItem
   id: enemy_chaser
-  displayName: "\u8FFD\u5C3E\u6575 Prefab"
+  displayName: "\u8FFD\u5C3E\u6575"
   icon: {fileID: 0}
-  prefab: {fileID: 3606662782293865053, guid: 46de26bcd23c2c742afd6512e566633f, type: 3}
+  prefab: {fileID: 3606662782293865053, guid: 9cab222c6a99f334ba85b329de0c0c1a, type: 3}
   alignToSurface: 1
   defaultScale: 1
   allowScale: 0
+  surfaceOffset: 0
+  unique: 0
+  pairedPlacement: 0

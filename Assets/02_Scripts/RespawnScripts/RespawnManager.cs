@@ -87,4 +87,13 @@ public class RespawnManager : MonoBehaviour
         resumeSnapshot = null;
         return true;
     }
+
+    /// <summary>
+    /// リスポーン地点の設定を解除する
+    /// （ステージメーカーのスタート地点が、通常のゲームに残らないようにするため）
+    /// </summary>
+    public void ClearRespawnPoint()
+    {
+        HasRespawnPoint = false;
+    }
 }

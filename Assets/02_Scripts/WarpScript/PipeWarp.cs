@@ -128,6 +128,14 @@ public class PipeWarp : MonoBehaviour
         if (ctrl != null) ctrl.enabled = true;
     }
 
+    /// <summary>
+    /// ステージ読込時に、コードから接続先を設定する
+    /// </summary>
+    public void Connect(PipeWarp other)
+    {
+        connectedPipe = other;
+    }
+
 #if UNITY_EDITOR
     /// <summary>
     /// エディタ上でこのオブジェクトを選択した時に、

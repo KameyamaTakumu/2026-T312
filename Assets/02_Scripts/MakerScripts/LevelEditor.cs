@@ -17,9 +17,15 @@ public class LevelEditor : MonoBehaviour
     private float yaw;
     private float scale = 1f;
 
+    // 1つ目だけ置いて、まだ相方がいない土管
+    private PlacedObject pendingPair;
+
     // UI のボタンから呼ぶ
     public void Select(PlaceableItem item)
     {
+        // 1つ目だけ置いた状態で別のアイテムを選んだら、その1つ目は消す
+        CancelPending();
+
         selected = item;
         scale = item != null ? item.defaultScale : 1f;
 
@@ -33,6 +39,9 @@ public class LevelEditor : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            CancelPending();
+
         if (selected == null || cam == null) return;
 
         // UI の上では配置しない
@@ -58,7 +67,8 @@ public class LevelEditor : MonoBehaviour
         if (selected.alignToSurface &&
             Physics.Raycast(ray, out RaycastHit hit, 300f, surfaceMask, QueryTriggerInteraction.Ignore))
         {
-            pos = hit.point;
+            // 面の法線方向に、設定した高さだけ浮かせる（スケールに比例させる）
+            pos = hit.point + hit.normal * (selected.surfaceOffset * scale);
             // 面の法線を上方向に揃える（惑星の曲面でも建物の壁でも対応）
             rot = Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.Euler(0f, yaw, 0f);
         }
@@ -94,12 +104,22 @@ public class LevelEditor : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, 300f, ~0, QueryTriggerInteraction.Ignore))
         {
             PlacedObject po = hit.collider.GetComponentInParent<PlacedObject>();
-            if (po != null) Destroy(po.gameObject);
+            if (po != null) DeleteWithPartner(po);
         }
     }
 
     private void Place(Vector3 pos, Quaternion rot)
     {
+        // 1つだけのアイテムは、すでに置いてあるものを消して置き直す
+        if (selected.unique)
+        {
+            foreach (var old in levelRoot.GetComponentsInChildren<PlacedObject>())
+            {
+                if (old.id == selected.id)
+                    Destroy(old.gameObject);
+            }
+        }
+
         GameObject obj = Instantiate(selected.prefab, pos, rot, levelRoot);
         obj.transform.localScale = Vector3.one * scale;
 
@@ -110,6 +130,22 @@ public class LevelEditor : MonoBehaviour
         var po = obj.AddComponent<PlacedObject>();
         po.id = selected.id;
         po.scale = scale;
+
+        if (selected.pairedPlacement)
+        {
+            if (pendingPair == null)
+            {
+                // 1つ目：新しいペアIDを発行して、相方待ちにする
+                po.pairId = System.Guid.NewGuid().ToString();
+                pendingPair = po;
+            }
+            else
+            {
+                // 2つ目：1つ目と同じIDにしてペア成立
+                po.pairId = pendingPair.pairId;
+                pendingPair = null;
+            }
+        }
     }
 
     /// <summary>エディット中は挙動を止める（スクリプト無効・物理無効）</summary>
@@ -126,6 +162,32 @@ public class LevelEditor : MonoBehaviour
                 c.enabled = false;
     }
 
+    private void DeleteWithPartner(PlacedObject target)
+    {
+        // 同じペアIDの相方も一緒に消す
+        if (!string.IsNullOrEmpty(target.pairId))
+        {
+            foreach (var other in levelRoot.GetComponentsInChildren<PlacedObject>())
+            {
+                if (other != target && other.pairId == target.pairId)
+                    Destroy(other.gameObject);
+            }
+        }
+
+        if (pendingPair == target)
+            pendingPair = null;
+
+        Destroy(target.gameObject);
+    }
+
+    private void CancelPending()
+    {
+        if (pendingPair == null) return;
+
+        Destroy(pendingPair.gameObject);
+        pendingPair = null;
+    }
+
     // ─────────── 保存・読込 ───────────
 
     private string PathOf(string levelName)
@@ -136,12 +198,16 @@ public class LevelEditor : MonoBehaviour
         var data = new LevelData();
         foreach (var po in levelRoot.GetComponentsInChildren<PlacedObject>())
         {
+            // 相方がまだいない土管は保存しない
+            if (po == pendingPair) continue;
+
             data.items.Add(new PlacedData
             {
                 id = po.id,
                 pos = po.transform.position,
                 rot = po.transform.rotation,
-                scale = po.scale
+                scale = po.scale,
+                pairId = po.pairId
             });
         }
         File.WriteAllText(PathOf(levelName), JsonUtility.ToJson(data, true));
@@ -149,6 +215,8 @@ public class LevelEditor : MonoBehaviour
 
     public void Load(string levelName)
     {
+        pendingPair = null;
+
         string path = PathOf(levelName);
         if (!File.Exists(path)) return;
 
@@ -167,6 +235,7 @@ public class LevelEditor : MonoBehaviour
             var po = obj.AddComponent<PlacedObject>();
             po.id = d.id;
             po.scale = d.scale;
+            po.pairId = d.pairId;
         }
     }
 }

@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 82bb0be8c820e9f4fa80f81a1bcb7921, type: 3}
-  m_Name: "\u60D1\u661F Prefab"
+  m_Name: "\u30B3\u30A4\u30F3 Prefab"
   m_EditorClassIdentifier: Assembly-CSharp::PlaceableItem
-  id: planet
-  displayName: "\u60D1\u661F"
+  id: coin
+  displayName: "\u30B3\u30A4\u30F3"
   icon: {fileID: 0}
-  prefab: {fileID: 251161572710030044, guid: 4a100adf0a0e9f14da6857bdba57b1ff, type: 3}
-  alignToSurface: 0
-  defaultScale: 10
-  allowScale: 1
-  surfaceOffset: 0
+  prefab: {fileID: 1282157366893234392, guid: 32b7f51181f572f48a153d8d00c15d12, type: 3}
+  alignToSurface: 1
+  defaultScale: 1
+  allowScale: 0
+  surfaceOffset: 1
   unique: 0
   pairedPlacement: 0
