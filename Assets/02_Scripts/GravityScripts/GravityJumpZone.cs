@@ -129,6 +129,18 @@ public class GravityJumpZone : MonoBehaviour
             gb.OnExitGravityJumpZone(this);
     }
 
+    /// <summary>ステージ読込時に、コードから次のゾーンを設定する</summary>
+    public void SetNext(GravityJumpZone next)
+    {
+        nextZone = next;
+    }
+
+    /// <summary>ステージ読込時に、コードから着地先の惑星を設定する</summary>
+    public void SetTargetPlanet(GravityAttractor planet)
+    {
+        targetPlanet = planet;
+    }
+
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {

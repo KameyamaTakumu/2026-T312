@@ -22,4 +22,13 @@ public class PlaceableItem : ScriptableObject
 
     // true の場合、2回置くごとに1組のペアになる
     public bool pairedPlacement = false;
+
+    // true の場合、置いた順にゾーンがつながる（引力ジャンプゾーン用）
+    public bool chainedPlacement = false;
+
+    // 面に当たれば吸着、当たらなければ空間に置く（Align To Surface も ON にして使う）
+    public bool surfaceOrFree = false;
+
+    // true の場合、置いたあとに行き先の惑星をクリックして指定する（ランチャー用）
+    public bool needsTarget = false;
 }

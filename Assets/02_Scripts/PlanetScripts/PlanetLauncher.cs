@@ -30,6 +30,11 @@ public class PlanetLauncher : MonoBehaviour
     [CustomLabel("一度だけ使用可"), SerializeField]
     private bool useOnce = true;
 
+    // true の場合、landingOffset を「惑星の表面からの距離」として扱う。
+    // 拡大した惑星や、ステージメーカーで置いた惑星に使う
+    [CustomLabel("着地オフセットを表面基準にする"), SerializeField]
+    private bool offsetFromSurface = false;
+
     // 使用済みフラグ
     private bool used = false;
 
@@ -62,18 +67,20 @@ public class PlanetLauncher : MonoBehaviour
         // 着地点計算
         // ─────────────────────────────────
 
-        // 惑星中心 → プレイヤー方向
-        // これを法線方向として利用
-        Vector3 dirToPlayer =
-            (
-                other.transform.position
-                - targetPlanet.position
-            ).normalized;
+        //// 惑星中心 → プレイヤー方向
+        //// これを法線方向として利用
+        //Vector3 dirToPlayer =
+        //    (
+        //        other.transform.position
+        //        - targetPlanet.position
+        //    ).normalized;
 
-        // 惑星表面位置
-        Vector3 landingPosition =
-            targetPlanet.position
-            + dirToPlayer * landingOffset;
+        //// 惑星表面位置
+        //Vector3 landingPosition =
+        //    targetPlanet.position
+        //    + dirToPlayer * landingOffset;
+
+        Vector3 landingPosition = ComputeLanding(other.transform.position);
 
         // 惑星間飛行開始
         manager.StartTravel(
@@ -89,6 +96,36 @@ public class PlanetLauncher : MonoBehaviour
             used = true;
     }
 
+    /// <summary>ステージ読込時に、コードから行き先を設定する</summary>
+    public void SetTarget(Transform planet)
+    {
+        targetPlanet = planet;
+    }
+
+    /// <summary>
+    /// fromPos 側から見た、行き先惑星への着地点を返す
+    /// </summary>
+    private Vector3 ComputeLanding(Vector3 fromPos)
+    {
+        Vector3 center = targetPlanet.position;
+        Vector3 dir = (fromPos - center).normalized;
+
+        if (offsetFromSurface)
+        {
+            // 惑星の外側から中心へレイを飛ばし、そのコライダーの表面の点を求める
+            Collider col = targetPlanet.GetComponent<Collider>();
+            if (col != null)
+            {
+                Ray ray = new Ray(center + dir * 1000f, -dir);
+                if (col.Raycast(ray, out RaycastHit hit, 2000f))
+                    return hit.point + dir * landingOffset;
+            }
+        }
+
+        // 従来の動作（中心からの距離）
+        return center + dir * landingOffset;
+    }
+
 #if UNITY_EDITOR
 
     /// <summary>
@@ -99,16 +136,18 @@ public class PlanetLauncher : MonoBehaviour
         if (targetPlanet == null)
             return;
 
-        // 現在位置方向を基準に着地点計算
-        Vector3 dirToThis =
-            (
-                transform.position
-                - targetPlanet.position
-            ).normalized;
+        //// 現在位置方向を基準に着地点計算
+        //Vector3 dirToThis =
+        //    (
+        //        transform.position
+        //        - targetPlanet.position
+        //    ).normalized;
 
-        Vector3 landingPosition =
-            targetPlanet.position
-            + dirToThis * landingOffset;
+        //Vector3 landingPosition =
+        //    targetPlanet.position
+        //    + dirToThis * landingOffset;
+
+        Vector3 landingPosition = ComputeLanding(transform.position);
 
         // 着地点表示
         Gizmos.color = Color.cyan;

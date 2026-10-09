@@ -19,6 +19,9 @@ public class LevelLoader : MonoBehaviour
 
         PlayerSpawnPoint spawn = null;
         var pairs = new Dictionary<string, List<PipeWarp>>();
+        var chains = new Dictionary<string, List<(int order, GravityJumpZone zone)>>();
+        var byUid = new Dictionary<string, GameObject>();
+        var launchers = new List<(PlanetLauncher launcher, string targetUid)>();
 
         foreach (var d in data.items)
         {
@@ -31,6 +34,29 @@ public class LevelLoader : MonoBehaviour
             var sp = obj.GetComponent<PlayerSpawnPoint>();
             if (sp != null)
                 spawn = sp;
+
+            if (!string.IsNullOrEmpty(d.uid))
+                byUid[d.uid] = obj;
+
+            var launcher = obj.GetComponentInChildren<PlanetLauncher>();
+            if (launcher != null && !string.IsNullOrEmpty(d.targetUid))
+                launchers.Add((launcher, d.targetUid));
+
+            // エディット専用の目印を非表示にする
+            foreach (var m in obj.GetComponentsInChildren<EditorOnlyMarker>(true))
+                m.gameObject.SetActive(false);
+
+            // ゾーンの連続配置を集める
+            if (!string.IsNullOrEmpty(d.pairId))
+            {
+                GravityJumpZone zone = obj.GetComponentInChildren<GravityJumpZone>();
+                if (zone != null)
+                {
+                    if (!chains.ContainsKey(d.pairId))
+                        chains[d.pairId] = new List<(int, GravityJumpZone)>();
+                    chains[d.pairId].Add((d.order, zone));
+                }
+            }
 
             // ペアIDごとに土管を集める
             if (!string.IsNullOrEmpty(d.pairId))
@@ -53,8 +79,46 @@ public class LevelLoader : MonoBehaviour
             kv.Value[1].Connect(kv.Value[0]);
         }
 
+        // 惑星のスケールがコライダーに反映されてから距離を測る
+        Physics.SyncTransforms();
+
+        foreach (var kv in chains)
+        {
+            var list = kv.Value;
+            if (list.Count < 2) continue;
+
+            // 置いた順に並べ、前のゾーンの「次」を設定する
+            list.Sort((a, b) => a.order.CompareTo(b.order));
+            for (int i = 0; i < list.Count - 1; i++)
+                list[i].zone.SetNext(list[i + 1].zone);
+
+            // 終点は、いちばん近い惑星に着地させる
+            var last = list[list.Count - 1].zone;
+            last.SetTargetPlanet(FindNearestAttractor(last.transform.position));
+        }
+
+        // ランチャーの行き先を接続する
+        foreach (var (launcher, targetUid) in launchers)
+        {
+            if (byUid.TryGetValue(targetUid, out GameObject targetObj))
+                launcher.SetTarget(targetObj.transform);
+        }
+
         if (spawn != null)
             ApplySpawn(spawn);
+    }
+
+    private static GravityAttractor FindNearestAttractor(Vector3 pos)
+    {
+        GravityAttractor best = null;
+        float min = float.MaxValue;
+
+        foreach (var a in GravityAttractor.All)
+        {
+            float d = a.DistanceToSurface(pos);
+            if (d < min) { min = d; best = a; }
+        }
+        return best;
     }
 
     private void ApplySpawn(PlayerSpawnPoint spawn)

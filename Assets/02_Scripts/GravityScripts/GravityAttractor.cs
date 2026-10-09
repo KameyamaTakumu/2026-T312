@@ -109,4 +109,20 @@ public class GravityAttractor : MonoBehaviour
             return;
         SoundManager.Instance.PlayBGM(planetBGM);
     }
+
+    private Collider anyCollider;
+
+    /// <summary>
+    /// 位置 pos から、この重力源の表面までの距離（内部なら 0）
+    /// </summary>
+    public float DistanceToSurface(Vector3 pos)
+    {
+        if (anyCollider == null)
+            anyCollider = GetComponent<Collider>();
+
+        if (anyCollider == null)
+            return Vector3.Distance(pos, transform.position);
+
+        return Vector3.Distance(anyCollider.ClosestPoint(pos), pos);
+    }
 }
