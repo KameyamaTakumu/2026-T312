@@ -16,8 +16,8 @@ MonoBehaviour:
   displayName: "\u91CD\u529B\u30BE\u30FC\u30F3"
   icon: {fileID: 0}
   prefab: {fileID: 6983704297601004054, guid: efbd478695a639c40bbe7fc2bbf62a9e, type: 3}
-  alignToSurface: 1
-  defaultScale: 1
+  alignToSurface: 0
+  defaultScale: 10
   allowScale: 1
   surfaceOffset: 0
   unique: 0

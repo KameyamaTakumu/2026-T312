@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
 
 public class LevelEditor : MonoBehaviour
 {
@@ -12,6 +13,20 @@ public class LevelEditor : MonoBehaviour
     [Header("配置設定")]
     [SerializeField] private LayerMask surfaceMask = ~0;   // 吸着先（惑星・建物）
     [SerializeField] private float freePlaceDistance = 30f;
+
+    [Header("作業平面（空間に置く物の高さ）")]
+    [SerializeField] private float planeY = 0f;
+    [SerializeField] private float planeMoveSpeed = 15f;
+    [SerializeField] private float maxPlaceDistance = 300f;
+
+    // 平面を可視化する半透明マテリアル（未設定なら平面は表示しない）
+    [SerializeField] private Material planeMaterial;
+
+    // 高さを表示するテキスト
+    [SerializeField] private TMP_Text heightLabel;
+
+    private Transform planeVisual;
+    private bool planeVisible;
 
     private PlaceableItem selected;
     private GameObject ghost;
@@ -48,8 +63,28 @@ public class LevelEditor : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (planeMaterial == null) return;
+
+        // 平面の見た目（当たり判定は消す）
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        go.name = "WorkPlane";
+        Destroy(go.GetComponent<Collider>());
+
+        var mr = go.GetComponent<MeshRenderer>();
+        mr.sharedMaterial = planeMaterial;
+        mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
+        go.transform.localScale = new Vector3(30f, 1f, 30f);   // 300 x 300
+        go.SetActive(false);
+        planeVisual = go.transform;
+    }
+
     private void Update()
     {
+        planeVisible = false;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             CancelPending();
@@ -77,21 +112,66 @@ public class LevelEditor : MonoBehaviour
             return;
         }
 
-        // 回転・拡大縮小・奥行き
+        //// 回転・拡大縮小・奥行き
+        //if (Input.GetKey(KeyCode.Q)) yaw -= 120f * Time.deltaTime;
+        //if (Input.GetKey(KeyCode.E)) yaw += 120f * Time.deltaTime;
+
+        //float wheel = Input.GetAxis("Mouse ScrollWheel");
+        //if (selected.allowScale) scale = Mathf.Clamp(scale + wheel * 5f, 0.2f, 50f);
+        //else if (!selected.alignToSurface || selected.surfaceOrFree)
+        //    freePlaceDistance = Mathf.Clamp(freePlaceDistance + wheel * 50f, 5f, 200f);
+
+        //// 配置位置を計算
+        //Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        //Vector3 pos;
+        //Quaternion rot;
+
+        //if (selected.alignToSurface &&
+        //    Physics.Raycast(ray, out RaycastHit hit, 300f, surfaceMask, QueryTriggerInteraction.Ignore))
+        //{
+        //    // 面の法線方向に、設定した高さだけ浮かせる（スケールに比例させる）
+        //    pos = hit.point + hit.normal * (selected.surfaceOffset * scale);
+        //    // 面の法線を上方向に揃える（惑星の曲面でも建物の壁でも対応）
+        //    rot = Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.Euler(0f, yaw, 0f);
+        //}
+        //else if (selected.alignToSurface && !selected.surfaceOrFree)
+        //{
+        //    if (ghost != null) ghost.SetActive(false);
+        //    return;
+        //}
+        //else
+        //{
+        //    pos = ray.GetPoint(freePlaceDistance);
+        //    rot = Quaternion.Euler(0f, yaw, 0f);
+        //}
+        // 回転
         if (Input.GetKey(KeyCode.Q)) yaw -= 120f * Time.deltaTime;
         if (Input.GetKey(KeyCode.E)) yaw += 120f * Time.deltaTime;
 
+        // 作業平面の高さ（R=上げる / F=下げる、Shift で高速）
+        float heightInput = 0f;
+        if (Input.GetKey(KeyCode.R)) heightInput += 1f;
+        if (Input.GetKey(KeyCode.F)) heightInput -= 1f;
+        float heightSpeed = planeMoveSpeed * (Input.GetKey(KeyCode.LeftShift) ? 4f : 1f);
+        planeY += heightInput * heightSpeed * Time.deltaTime;
+
+        // ホイール：拡大縮小できる物は拡大縮小、空間に置ける物は高さの調整
         float wheel = Input.GetAxis("Mouse ScrollWheel");
-        if (selected.allowScale) scale = Mathf.Clamp(scale + wheel * 5f, 0.2f, 50f);
+        if (selected.allowScale)
+            scale = Mathf.Clamp(scale + wheel * 5f, 0.2f, 50f);
         else if (!selected.alignToSurface || selected.surfaceOrFree)
-            freePlaceDistance = Mathf.Clamp(freePlaceDistance + wheel * 50f, 5f, 200f);
+            planeY += wheel * 30f;
+
+        // 空間に置ける物は、Alt を押している間は面に吸着せず作業平面に置く
+        bool canUsePlane = !selected.alignToSurface || selected.surfaceOrFree;
+        bool forcePlane = canUsePlane && Input.GetKey(KeyCode.LeftAlt);
 
         // 配置位置を計算
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         Vector3 pos;
         Quaternion rot;
 
-        if (selected.alignToSurface &&
+        if (selected.alignToSurface && !forcePlane &&
             Physics.Raycast(ray, out RaycastHit hit, 300f, surfaceMask, QueryTriggerInteraction.Ignore))
         {
             // 面の法線方向に、設定した高さだけ浮かせる（スケールに比例させる）
@@ -99,7 +179,6 @@ public class LevelEditor : MonoBehaviour
             // 面の法線を上方向に揃える（惑星の曲面でも建物の壁でも対応）
             rot = Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.Euler(0f, yaw, 0f);
         }
-        //else if (selected.alignToSurface)
         else if (selected.alignToSurface && !selected.surfaceOrFree)
         {
             if (ghost != null) ghost.SetActive(false);
@@ -107,8 +186,10 @@ public class LevelEditor : MonoBehaviour
         }
         else
         {
-            pos = ray.GetPoint(freePlaceDistance);
+            // 空間配置：マウスの位置を、作業平面（高さ planeY）に投影した点
+            pos = PointOnWorkPlane(ray);
             rot = Quaternion.Euler(0f, yaw, 0f);
+            planeVisible = true;
         }
 
         if (ghost != null)
@@ -124,12 +205,20 @@ public class LevelEditor : MonoBehaviour
 
     private void LateUpdate()
     {
+        UpdatePlaneVisual();
+
         // 右クリックで削除（UI の上は除く）
         if (!Input.GetMouseButtonDown(1)) return;
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
+        //Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        //if (Physics.Raycast(ray, out RaycastHit hit, 300f, ~0, QueryTriggerInteraction.Ignore))
+        //{
+        //    PlacedObject po = hit.collider.GetComponentInParent<PlacedObject>();
+        //    if (po != null) DeleteWithPartner(po);
+        //}
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, 300f, ~0, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(ray, out RaycastHit hit, 300f, ~0, QueryTriggerInteraction.Collide))
         {
             PlacedObject po = hit.collider.GetComponentInParent<PlacedObject>();
             if (po != null) DeleteWithPartner(po);
@@ -154,6 +243,7 @@ public class LevelEditor : MonoBehaviour
         // 配置物は動かさない（敵の徘徊やコインの回収を止める）
         // コライダーは残すので、その上に別の物を置ける
         MakeInert(obj, keepColliders: true);
+        EnsureClickable(obj);
 
         var po = obj.AddComponent<PlacedObject>();
         po.id = selected.id;
@@ -208,6 +298,7 @@ public class LevelEditor : MonoBehaviour
             foreach (var c in obj.GetComponentsInChildren<Collider>())
                 c.enabled = false;
     }
+
 
     private void DeleteWithPartner(PlacedObject target)
     {
@@ -296,6 +387,93 @@ public class LevelEditor : MonoBehaviour
         pendingTarget = null;
     }
 
+    /// <summary>
+    /// マウスのレイと、高さ planeY の水平面との交点を返す
+    /// </summary>
+    private Vector3 PointOnWorkPlane(Ray ray)
+    {
+        Plane plane = new Plane(Vector3.up, new Vector3(0f, planeY, 0f));
+
+        if (plane.Raycast(ray, out float enter) && enter <= maxPlaceDistance)
+            return ray.GetPoint(enter);
+
+        // 平面と交わらない（水平線の向こうを見ている等）場合は、カメラ前方の一定距離に置く
+        return ray.GetPoint(freePlaceDistance);
+    }
+
+    /// <summary>
+    /// 作業平面の表示と、高さのテキストを更新する
+    /// </summary>
+    private void UpdatePlaneVisual()
+    {
+        if (planeVisual != null)
+        {
+            planeVisual.gameObject.SetActive(planeVisible);
+
+            // カメラの真下に追従させて、常に足元に広がっているように見せる
+            if (planeVisible && cam != null)
+            {
+                Vector3 c = cam.transform.position;
+                planeVisual.position = new Vector3(c.x, planeY, c.z);
+            }
+        }
+
+        if (heightLabel != null)
+            heightLabel.text = planeVisible ? $"高さ Y = {planeY:0.0}" : "";
+    }
+
+    /// <summary>
+    /// エディット中に右クリックで選べるよう、非トリガーのコライダーが無い物には
+    /// 見た目の大きさに合わせた Box Collider を付ける。
+    /// プレイ用シーンは Prefab から生成するので、これは影響しない
+    /// </summary>
+    private static void EnsureClickable(GameObject obj)
+    {
+        // すでに有効な非トリガーのコライダーがあれば何もしない
+        foreach (var c in obj.GetComponentsInChildren<Collider>())
+        {
+            if (c.enabled && !c.isTrigger)
+                return;
+        }
+
+        // 見た目（Renderer）の範囲を集める（パーティクルや軌跡は除く）
+        Bounds bounds = default;
+        bool hasBounds = false;
+
+        foreach (var r in obj.GetComponentsInChildren<Renderer>())
+        {
+            if (r is ParticleSystemRenderer || r is TrailRenderer || r is LineRenderer)
+                continue;
+
+            if (!hasBounds)
+            {
+                bounds = r.bounds;
+                hasBounds = true;
+            }
+            else
+            {
+                bounds.Encapsulate(r.bounds);
+            }
+        }
+
+        // 見た目が無い物（ゾーンなど）は、小さな球で代用する
+        if (!hasBounds)
+        {
+            var sphere = obj.AddComponent<SphereCollider>();
+            sphere.radius = 0.5f;
+            return;
+        }
+
+        // ワールドの範囲を、このオブジェクトのローカル座標に直して設定する
+        var box = obj.AddComponent<BoxCollider>();
+        Vector3 s = obj.transform.lossyScale;
+        box.center = obj.transform.InverseTransformPoint(bounds.center);
+        box.size = new Vector3(
+            bounds.size.x / Mathf.Max(Mathf.Abs(s.x), 0.0001f),
+            bounds.size.y / Mathf.Max(Mathf.Abs(s.y), 0.0001f),
+            bounds.size.z / Mathf.Max(Mathf.Abs(s.z), 0.0001f));
+    }
+
     // ─────────── 保存・読込 ───────────
 
     private string PathOf(string levelName)
@@ -348,6 +526,7 @@ public class LevelEditor : MonoBehaviour
             GameObject obj = Instantiate(item.prefab, d.pos, d.rot, levelRoot);
             obj.transform.localScale = Vector3.one * d.scale;
             MakeInert(obj, keepColliders: true);
+            EnsureClickable(obj);
 
             var po = obj.AddComponent<PlacedObject>();
             po.id = d.id;

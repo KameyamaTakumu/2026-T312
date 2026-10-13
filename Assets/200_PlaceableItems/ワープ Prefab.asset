@@ -17,9 +17,9 @@ MonoBehaviour:
   icon: {fileID: 0}
   prefab: {fileID: 2099316245153344885, guid: 4e312d91606201940ade83305ad1c71d, type: 3}
   alignToSurface: 1
-  defaultScale: 1
-  allowScale: 0
-  surfaceOffset: 2
+  defaultScale: 0.5
+  allowScale: 1
+  surfaceOffset: 0
   unique: 0
   pairedPlacement: 0
   chainedPlacement: 0
