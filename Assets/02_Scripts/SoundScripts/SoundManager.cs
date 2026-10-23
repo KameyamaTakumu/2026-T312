@@ -60,7 +60,8 @@ public enum BGM
     Planet2,
     Planet3,
     Tutorial,
-    Title
+    Title,
+    StageMaker
 }
 
 #endregion

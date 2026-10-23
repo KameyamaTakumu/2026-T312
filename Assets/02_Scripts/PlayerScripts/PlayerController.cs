@@ -194,6 +194,7 @@ public class PlayerController : MonoBehaviour
         ApplyFallGravity();
 
         // 次フレームの比較用に、今フレームの床の水平速度を記憶する
+        // Vector3.Project で惑星上方向の速度成分を除去しているので、床が傾いていても水平速度のみを取得できる
         prevPlatformVelocity = currentPlatform != null
             ? currentPlatform.CurrentVelocity - Vector3.Project(currentPlatform.CurrentVelocity, transform.up)
             : Vector3.zero;

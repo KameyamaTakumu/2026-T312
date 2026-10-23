@@ -63,7 +63,8 @@ public class SceneChanger : MonoBehaviour
     /// </summary>
     private void SaveResumePointIfPlaying()
     {
-        if (RespawnManager.Instance == null)
+        // フェード中は二重遷移しない（連打・キー操作対策）
+        if (ScreenFader.Instance != null && ScreenFader.Instance.IsBlocking)
             return;
 
         PlayerController player = FindAnyObjectByType<PlayerController>();

@@ -27,6 +27,10 @@ public class ScreenFader : MonoBehaviour
     private static readonly int RadiusID = Shader.PropertyToID("_Radius");
     private static readonly int AspectRatioID = Shader.PropertyToID("_AspectRatio");
 
+    /// <summary>フェード中（＝入力を遮断している間）かどうか</summary>
+    public bool IsBlocking { get; private set; }
+
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -45,6 +49,9 @@ public class ScreenFader : MonoBehaviour
         image.material = material;
 
         UpdateAspectRatio();
+
+        // 通常時はクリックを遮断しない
+        image.raycastTarget = false;
 
         // 初期状態：画面が見えている状態
         SetRadius(openRadius);
@@ -78,24 +85,37 @@ public class ScreenFader : MonoBehaviour
         material.SetFloat(RadiusID, radius);
     }
 
+    private void SetBlocking(bool value)
+    {
+        IsBlocking = value;
+        image.raycastTarget = value;
+    }
+
     /// <summary>周囲から丸く閉じていく（死亡演出）</summary>
     public Tween FadeOut(System.Action onComplete = null)
     {
+        SetBlocking(true); // 閉じ始めた時点から遮断
         SE.Fade.Play();
 
         return DOTween.To(() => material.GetFloat(RadiusID), SetRadius, 0f, fadeDuration)
             .SetEase(Ease.InOutQuad)
+            .SetUpdate(true)
             .OnComplete(() => onComplete?.Invoke());
     }
 
     /// <summary>中心から丸く広がっていく（リスポーン演出）</summary>
     public Tween FadeIn(System.Action onComplete = null)
     {
+        SetBlocking(true);
         SetRadius(0f);
         SE.Fade.Play();
 
         return DOTween.To(() => material.GetFloat(RadiusID), SetRadius, openRadius, fadeDuration)
-            .SetEase(Ease.InOutQuad)
-            .OnComplete(() => onComplete?.Invoke());
+        .SetEase(Ease.InOutQuad)
+        .OnComplete(() =>
+        {
+            SetBlocking(false); // 完全に開き切ったら解除
+            onComplete?.Invoke();
+        });
     }
 }
