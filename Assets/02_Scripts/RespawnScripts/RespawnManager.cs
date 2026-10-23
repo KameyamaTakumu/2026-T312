@@ -95,5 +95,7 @@ public class RespawnManager : MonoBehaviour
     public void ClearRespawnPoint()
     {
         HasRespawnPoint = false;
+        RespawnPosition = Vector3.zero;
+        RespawnRotation = Quaternion.identity;
     }
 }

@@ -18,7 +18,10 @@ MonoBehaviour:
   prefab: {fileID: 3606662782293865053, guid: 9cab222c6a99f334ba85b329de0c0c1a, type: 3}
   alignToSurface: 1
   defaultScale: 1
-  allowScale: 0
+  allowScale: 1
   surfaceOffset: 0
   unique: 0
   pairedPlacement: 0
+  chainedPlacement: 0
+  surfaceOrFree: 0
+  needsTarget: 0

@@ -1746,7 +1746,7 @@ PrefabInstance:
       objectReference: {fileID: 1493828290}
     - target: {fileID: 2630481577434106075, guid: 4e312d91606201940ade83305ad1c71d, type: 3}
       propertyPath: landingOffset
-      value: 60
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3049457467231889900, guid: 4e312d91606201940ade83305ad1c71d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1802,7 +1802,7 @@ PrefabInstance:
       objectReference: {fileID: 2142090284}
     - target: {fileID: 7746677521180822505, guid: 4e312d91606201940ade83305ad1c71d, type: 3}
       propertyPath: m_VersionIndex
-      value: 826
+      value: 832
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20909,7 +20909,7 @@ PrefabInstance:
       objectReference: {fileID: 472760408}
     - target: {fileID: 2630481577434106075, guid: 4e312d91606201940ade83305ad1c71d, type: 3}
       propertyPath: landingOffset
-      value: 80
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3049457467231889900, guid: 4e312d91606201940ade83305ad1c71d, type: 3}
       propertyPath: m_LocalPosition.x

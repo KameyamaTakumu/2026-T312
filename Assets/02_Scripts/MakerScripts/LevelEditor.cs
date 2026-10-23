@@ -85,6 +85,9 @@ public class LevelEditor : MonoBehaviour
     {
         planeVisible = false;
 
+        // 入力欄の編集中は、キー操作をすべて無効にする
+        if (TextInputGuard.IsTyping) return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             CancelPending();
@@ -112,38 +115,6 @@ public class LevelEditor : MonoBehaviour
             return;
         }
 
-        //// 回転・拡大縮小・奥行き
-        //if (Input.GetKey(KeyCode.Q)) yaw -= 120f * Time.deltaTime;
-        //if (Input.GetKey(KeyCode.E)) yaw += 120f * Time.deltaTime;
-
-        //float wheel = Input.GetAxis("Mouse ScrollWheel");
-        //if (selected.allowScale) scale = Mathf.Clamp(scale + wheel * 5f, 0.2f, 50f);
-        //else if (!selected.alignToSurface || selected.surfaceOrFree)
-        //    freePlaceDistance = Mathf.Clamp(freePlaceDistance + wheel * 50f, 5f, 200f);
-
-        //// 配置位置を計算
-        //Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        //Vector3 pos;
-        //Quaternion rot;
-
-        //if (selected.alignToSurface &&
-        //    Physics.Raycast(ray, out RaycastHit hit, 300f, surfaceMask, QueryTriggerInteraction.Ignore))
-        //{
-        //    // 面の法線方向に、設定した高さだけ浮かせる（スケールに比例させる）
-        //    pos = hit.point + hit.normal * (selected.surfaceOffset * scale);
-        //    // 面の法線を上方向に揃える（惑星の曲面でも建物の壁でも対応）
-        //    rot = Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.Euler(0f, yaw, 0f);
-        //}
-        //else if (selected.alignToSurface && !selected.surfaceOrFree)
-        //{
-        //    if (ghost != null) ghost.SetActive(false);
-        //    return;
-        //}
-        //else
-        //{
-        //    pos = ray.GetPoint(freePlaceDistance);
-        //    rot = Quaternion.Euler(0f, yaw, 0f);
-        //}
         // 回転
         if (Input.GetKey(KeyCode.Q)) yaw -= 120f * Time.deltaTime;
         if (Input.GetKey(KeyCode.E)) yaw += 120f * Time.deltaTime;
@@ -474,19 +445,81 @@ public class LevelEditor : MonoBehaviour
             bounds.size.z / Mathf.Max(Mathf.Abs(s.z), 0.0001f));
     }
 
+    //// ─────────── 保存・読込 ───────────
+
+    //private string PathOf(string levelName)
+    //    => Path.Combine(Application.persistentDataPath, levelName + ".json");
+
+    //public void Save(string levelName)
+    //{
+    //    EndChain();
+
+    //    var data = new LevelData();
+    //    foreach (var po in levelRoot.GetComponentsInChildren<PlacedObject>())
+    //    {
+    //        // 相方がまだいない土管は保存しない
+    //        if (po == pendingPair) continue;
+    //        if (po == pendingTarget) continue;
+
+    //        data.items.Add(new PlacedData
+    //        {
+    //            id = po.id,
+    //            pos = po.transform.position,
+    //            rot = po.transform.rotation,
+    //            scale = po.scale,
+    //            pairId = po.pairId,
+    //            order = po.order,
+    //            uid = po.uid,
+    //            targetUid = po.targetUid
+    //        });
+    //    }
+    //    File.WriteAllText(PathOf(levelName), JsonUtility.ToJson(data, true));
+    //}
+
+    //public void Load(string levelName)
+    //{
+    //    pendingPair = null;
+    //    pendingTarget = null;
+
+    //    currentChain.Clear();
+
+    //    string path = PathOf(levelName);
+    //    if (!File.Exists(path)) return;
+
+    //    foreach (Transform child in levelRoot) Destroy(child.gameObject);
+
+    //    var data = JsonUtility.FromJson<LevelData>(File.ReadAllText(path));
+    //    foreach (var d in data.items)
+    //    {
+    //        var item = catalog.Find(d.id);
+    //        if (item == null) continue;
+
+    //        GameObject obj = Instantiate(item.prefab, d.pos, d.rot, levelRoot);
+    //        obj.transform.localScale = Vector3.one * d.scale;
+    //        MakeInert(obj, keepColliders: true);
+    //        EnsureClickable(obj);
+
+    //        var po = obj.AddComponent<PlacedObject>();
+    //        po.id = d.id;
+    //        po.scale = d.scale;
+    //        po.pairId = d.pairId;
+    //        po.order = d.order;
+    //        po.uid = string.IsNullOrEmpty(d.uid) ? System.Guid.NewGuid().ToString() : d.uid;
+    //        po.targetUid = d.targetUid;
+    //    }
+    //}
+
     // ─────────── 保存・読込 ───────────
 
-    private string PathOf(string levelName)
-        => Path.Combine(Application.persistentDataPath, levelName + ".json");
-
-    public void Save(string levelName)
+    /// <summary>現在の配置を LevelData にまとめる</summary>
+    public LevelData BuildData()
     {
         EndChain();
 
         var data = new LevelData();
         foreach (var po in levelRoot.GetComponentsInChildren<PlacedObject>())
         {
-            // 相方がまだいない土管は保存しない
+            // 相方がまだいない土管、行き先が未指定のランチャーは保存しない
             if (po == pendingPair) continue;
             if (po == pendingTarget) continue;
 
@@ -502,22 +535,25 @@ public class LevelEditor : MonoBehaviour
                 targetUid = po.targetUid
             });
         }
-        File.WriteAllText(PathOf(levelName), JsonUtility.ToJson(data, true));
+        return data;
     }
 
-    public void Load(string levelName)
+    /// <summary>LevelData の内容で、ステージを作り直す</summary>
+    public void ApplyData(LevelData data)
     {
+        if (data == null) return;
+
         pendingPair = null;
         pendingTarget = null;
-
         currentChain.Clear();
 
-        string path = PathOf(levelName);
-        if (!File.Exists(path)) return;
+        // 同じフレームの保存に古いものが混ざらないよう、先に非アクティブにする
+        foreach (Transform child in levelRoot)
+        {
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
+        }
 
-        foreach (Transform child in levelRoot) Destroy(child.gameObject);
-
-        var data = JsonUtility.FromJson<LevelData>(File.ReadAllText(path));
         foreach (var d in data.items)
         {
             var item = catalog.Find(d.id);
@@ -536,5 +572,21 @@ public class LevelEditor : MonoBehaviour
             po.uid = string.IsNullOrEmpty(d.uid) ? System.Guid.NewGuid().ToString() : d.uid;
             po.targetUid = d.targetUid;
         }
+    }
+
+    // 既存のボタンの OnClick からも、これまで通り呼べる
+    public void Save(string levelName)
+    {
+        if (LevelStorage.Save(levelName, BuildData()))
+            LevelStorage.CurrentLevelName = LevelStorage.Sanitize(levelName);
+    }
+
+    public void Load(string levelName)
+    {
+        LevelData data = LevelStorage.Load(levelName);
+        if (data == null) return;
+
+        ApplyData(data);
+        LevelStorage.CurrentLevelName = LevelStorage.Sanitize(levelName);
     }
 }

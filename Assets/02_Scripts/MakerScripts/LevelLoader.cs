@@ -12,10 +12,14 @@ public class LevelLoader : MonoBehaviour
 
     private void Awake()
     {
-        string path = Path.Combine(Application.persistentDataPath, levelName + ".json");
-        if (!File.Exists(path)) return;
+        //string path = Path.Combine(Application.persistentDataPath, levelName + ".json");
+        //if (!File.Exists(path)) return;
 
-        var data = JsonUtility.FromJson<LevelData>(File.ReadAllText(path));
+        //var data = JsonUtility.FromJson<LevelData>(File.ReadAllText(path));
+        // 最後に保存・読込したステージを優先し、無ければ Inspector の名前を使う
+        string lastName = LevelStorage.CurrentLevelName;
+        LevelData data = LevelStorage.Load(lastName) ?? LevelStorage.Load(levelName);
+        if (data == null) return;
 
         PlayerSpawnPoint spawn = null;
         var pairs = new Dictionary<string, List<PipeWarp>>();

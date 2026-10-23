@@ -46,6 +46,8 @@ public class FreeCamera : MonoBehaviour
 
     private void Update()
     {
+        if (TextInputGuard.IsTyping) return;
+
         HandleViewPreset();
         HandleLook();
         HandleMove();
@@ -151,8 +153,6 @@ public class FreeCamera : MonoBehaviour
             fwd = Vector3.ProjectOnPlane(screenUp, Vector3.up).normalized;
         }
 
-        //if (Input.GetKey(KeyCode.W)) dir += transform.forward;
-        //if (Input.GetKey(KeyCode.S)) dir -= transform.forward;
         if (Input.GetKey(KeyCode.W)) dir += fwd;
         if (Input.GetKey(KeyCode.S)) dir -= fwd;
         if (Input.GetKey(KeyCode.D)) dir += transform.right;
