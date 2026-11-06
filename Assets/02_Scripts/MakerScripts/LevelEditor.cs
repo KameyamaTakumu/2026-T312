@@ -182,12 +182,6 @@ public class LevelEditor : MonoBehaviour
         if (!Input.GetMouseButtonDown(1)) return;
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
-        //Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        //if (Physics.Raycast(ray, out RaycastHit hit, 300f, ~0, QueryTriggerInteraction.Ignore))
-        //{
-        //    PlacedObject po = hit.collider.GetComponentInParent<PlacedObject>();
-        //    if (po != null) DeleteWithPartner(po);
-        //}
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 300f, ~0, QueryTriggerInteraction.Collide))
         {
@@ -444,70 +438,6 @@ public class LevelEditor : MonoBehaviour
             bounds.size.y / Mathf.Max(Mathf.Abs(s.y), 0.0001f),
             bounds.size.z / Mathf.Max(Mathf.Abs(s.z), 0.0001f));
     }
-
-    //// ÑüÑüÑüÑüÑüÑüÑüÑüÑüÑüÑü ï€ë∂ÅEì«çû ÑüÑüÑüÑüÑüÑüÑüÑüÑüÑüÑü
-
-    //private string PathOf(string levelName)
-    //    => Path.Combine(Application.persistentDataPath, levelName + ".json");
-
-    //public void Save(string levelName)
-    //{
-    //    EndChain();
-
-    //    var data = new LevelData();
-    //    foreach (var po in levelRoot.GetComponentsInChildren<PlacedObject>())
-    //    {
-    //        // ëäï˚Ç™Ç‹ÇæÇ¢Ç»Ç¢ìyä«ÇÕï€ë∂ÇµÇ»Ç¢
-    //        if (po == pendingPair) continue;
-    //        if (po == pendingTarget) continue;
-
-    //        data.items.Add(new PlacedData
-    //        {
-    //            id = po.id,
-    //            pos = po.transform.position,
-    //            rot = po.transform.rotation,
-    //            scale = po.scale,
-    //            pairId = po.pairId,
-    //            order = po.order,
-    //            uid = po.uid,
-    //            targetUid = po.targetUid
-    //        });
-    //    }
-    //    File.WriteAllText(PathOf(levelName), JsonUtility.ToJson(data, true));
-    //}
-
-    //public void Load(string levelName)
-    //{
-    //    pendingPair = null;
-    //    pendingTarget = null;
-
-    //    currentChain.Clear();
-
-    //    string path = PathOf(levelName);
-    //    if (!File.Exists(path)) return;
-
-    //    foreach (Transform child in levelRoot) Destroy(child.gameObject);
-
-    //    var data = JsonUtility.FromJson<LevelData>(File.ReadAllText(path));
-    //    foreach (var d in data.items)
-    //    {
-    //        var item = catalog.Find(d.id);
-    //        if (item == null) continue;
-
-    //        GameObject obj = Instantiate(item.prefab, d.pos, d.rot, levelRoot);
-    //        obj.transform.localScale = Vector3.one * d.scale;
-    //        MakeInert(obj, keepColliders: true);
-    //        EnsureClickable(obj);
-
-    //        var po = obj.AddComponent<PlacedObject>();
-    //        po.id = d.id;
-    //        po.scale = d.scale;
-    //        po.pairId = d.pairId;
-    //        po.order = d.order;
-    //        po.uid = string.IsNullOrEmpty(d.uid) ? System.Guid.NewGuid().ToString() : d.uid;
-    //        po.targetUid = d.targetUid;
-    //    }
-    //}
 
     // ÑüÑüÑüÑüÑüÑüÑüÑüÑüÑüÑü ï€ë∂ÅEì«çû ÑüÑüÑüÑüÑüÑüÑüÑüÑüÑüÑü
 

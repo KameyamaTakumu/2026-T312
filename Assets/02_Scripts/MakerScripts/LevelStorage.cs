@@ -136,13 +136,18 @@ public static class LevelStorage
     /// <summary>ステージを、コピーして渡せる文字列（共有コード）にする</summary>
     public static string ToCode(LevelData data)
     {
+        // JSON形式にしたものをUTF-8でバイト列に変換する
+        // バイト列とは文字列をコンピュータが扱いやすい形にしたもの
         byte[] raw = Encoding.UTF8.GetBytes(JsonUtility.ToJson(data));
 
         using (var ms = new MemoryStream())
         {
+            // 共有コードの文字列を短くするためGZipで圧縮する
             using (var gz = new GZipStream(ms, System.IO.Compression.CompressionLevel.Optimal))
                 gz.Write(raw, 0, raw.Length);
 
+            // 圧縮したバイト列をBase64形式の文字列に変換する
+            // Base64形式とは、バイト列を文字列に変換する方法の一つ
             return CodePrefix + Convert.ToBase64String(ms.ToArray());
         }
     }
@@ -160,14 +165,19 @@ public static class LevelStorage
 
         try
         {
+            // Base64形式の文字列をバイト列に戻す
             byte[] compressed = Convert.FromBase64String(code.Substring(CodePrefix.Length));
 
             using (var input = new MemoryStream(compressed))
+
+            // GZipで圧縮されているので、解凍して元のJSON文字列に戻す
             using (var gz = new GZipStream(input, CompressionMode.Decompress))
             using (var output = new MemoryStream())
             {
                 gz.CopyTo(output);
+                // バイト列をUTF-8の文字列に変換する
                 string json = Encoding.UTF8.GetString(output.ToArray());
+                // JSON文字列をLevelDataに変換する
                 return Validate(JsonUtility.FromJson<LevelData>(json));
             }
         }

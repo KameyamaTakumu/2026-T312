@@ -2463,7 +2463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneObject:
-    m_SceneName: Test_MakerScene
+    m_SceneName: 04_MakerScene
   recordAsEntryPoint: 0
   selfSceneObject:
     m_SceneName: 
