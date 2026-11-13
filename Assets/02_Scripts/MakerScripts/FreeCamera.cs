@@ -17,6 +17,9 @@ public class FreeCamera : MonoBehaviour
     [CustomLabel("高速移動の倍率（Shift）"), SerializeField]
     private float fastMultiplier = 3f;
 
+    [CustomLabel("矢印キーでの回転速度（度/秒）"), SerializeField]
+    private float arrowTurnSpeed = 90f;
+
     [Header("視点設定")]
 
     [CustomLabel("視点の回転感度"), SerializeField]
@@ -93,6 +96,19 @@ public class FreeCamera : MonoBehaviour
     /// </summary>
     private void HandleLook()
     {
+        // 矢印キーでも視点を回転する（中ボタンが無い環境用）
+        float keyYaw = (Input.GetKey(KeyCode.RightArrow) ? 1f : 0f)
+                     - (Input.GetKey(KeyCode.LeftArrow) ? 1f : 0f);
+        float keyPitch = (Input.GetKey(KeyCode.DownArrow) ? 1f : 0f)
+                       - (Input.GetKey(KeyCode.UpArrow) ? 1f : 0f);
+
+        if (keyYaw != 0f || keyPitch != 0f)
+        {
+            yaw += keyYaw * arrowTurnSpeed * Time.unscaledDeltaTime;
+            pitch = Mathf.Clamp(pitch + keyPitch * arrowTurnSpeed * Time.unscaledDeltaTime, -89f, 89f);
+            transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
+
         // ドラッグ開始（UIの上で押した場合は開始しない）
         if (Input.GetMouseButtonDown(2))
         {
@@ -124,16 +140,21 @@ public class FreeCamera : MonoBehaviour
     {
         isLooking = true;
 
-        // ドラッグ中はカーソルを固定して、画面端で止まらないようにする
+#if !UNITY_WEBGL || UNITY_EDITOR
+        // WebGL ではロックしない（ドラッグ中はキャンバスの外でも動きが届くことが多い）
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+#endif
     }
 
     private void EndLook()
     {
         isLooking = false;
+
+#if !UNITY_WEBGL || UNITY_EDITOR
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+#endif
     }
 
     /// <summary>
@@ -160,7 +181,7 @@ public class FreeCamera : MonoBehaviour
 
         // 上下はカメラの向きに関係なくワールドの上下
         if (Input.GetKey(KeyCode.Space)) dir += Vector3.up;
-        if (Input.GetKey(KeyCode.LeftControl)) dir -= Vector3.up;
+        if (Input.GetKey(KeyCode.C)) dir -= Vector3.up;
 
         if (dir == Vector3.zero)
             return;

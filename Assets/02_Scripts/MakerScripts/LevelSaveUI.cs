@@ -14,12 +14,20 @@ public class LevelSaveUI : MonoBehaviour
     [SerializeField] private TMP_InputField codeInput;       // 共有コード（表示・貼り付け用）
     [SerializeField] private TMP_Text messageLabel;          // 結果の表示
 
+    // WebGL では使えない UI（フォルダを開くボタン、コード入力欄など）
+    [SerializeField] private GameObject[] hideOnWebGL;
+
     // 上書き・削除の確認用（同じ名前でもう一度押したら実行）
     private string overwriteCandidate;
     private string deleteCandidate;
 
     private void Start()
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+foreach (var g in hideOnWebGL)
+    if (g != null) g.SetActive(false);
+#endif
+
         nameInput.onValueChanged.AddListener(_ => overwriteCandidate = null);
         levelDropdown.onValueChanged.AddListener(_ => deleteCandidate = null);
 
@@ -118,15 +126,29 @@ public class LevelSaveUI : MonoBehaviour
     {
         string code = LevelStorage.ToCode(editor.BuildData());
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+    // WebGL ではクリップボードに直接コピーできないので、ダイアログに表示する
+    WebPrompt.Show("共有コードです。全体を選択（Ctrl+A）してコピー（Ctrl+C）してください", code);
+    Show($"共有コードを表示しました（{code.Length}文字）");
+#else
         codeInput.text = code;
         GUIUtility.systemCopyBuffer = code;
         Show($"共有コードを作成しました（{code.Length}文字）");
+#endif
     }
 
     /// <summary>入力欄の共有コードからステージを読み込む</summary>
     public void OnLoadFromCode()
     {
-        LevelData data = LevelStorage.FromCode(codeInput.text);
+        string code = codeInput != null ? codeInput.text : "";
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    // WebGL では、ダイアログで貼り付けてもらう
+    code = WebPrompt.Show("共有コードを貼り付けてください", "");
+    if (code == null) return;   // キャンセル
+#endif
+
+        LevelData data = LevelStorage.FromCode(code);
         if (data == null)
         {
             Show("コードが正しくありません");
@@ -140,7 +162,9 @@ public class LevelSaveUI : MonoBehaviour
     /// <summary>ステージファイルのフォルダを開く（ファイルのやり取りに使う）</summary>
     public void OnOpenFolder()
     {
+#if !UNITY_WEBGL
         Application.OpenURL("file://" + LevelStorage.Folder);
+#endif
     }
 
     private void Show(string message)
