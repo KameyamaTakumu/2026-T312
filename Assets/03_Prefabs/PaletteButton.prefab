@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1336074668604237909}
   - component: {fileID: 1015391531971668919}
   - component: {fileID: 3771589976554911942}
+  - component: {fileID: 8418198877176827978}
   m_Layer: 5
   m_Name: PaletteButton
   m_TagString: Untagged
@@ -121,6 +122,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8418198877176827978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699159738681428177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5582bf736b1eb9141be7d7e43c24f08d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonSEBinder
+  buttonSEList:
+  - button: {fileID: 3771589976554911942}
+    seType: 6
 --- !u!1 &9002738733632425213
 GameObject:
   m_ObjectHideFlags: 0
